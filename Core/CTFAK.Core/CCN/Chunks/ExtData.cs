@@ -1,9 +1,9 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 
 namespace CTFAK.CCN.Chunks
 {
-    public class ExtData:ChunkLoader
+    public class ExtData : ChunkLoader
     {
         public byte[] data;
         public string name;
@@ -12,12 +12,7 @@ namespace CTFAK.CCN.Chunks
         {
             var filename = reader.ReadAscii();
             var data = reader.ReadBytes();
-            Logger.Log($"Found file {filename}, {data.Length}"); 
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new System.NotImplementedException();
+            Logger.Log($"Found file {filename}, {data.Length}");
         }
     }
 }

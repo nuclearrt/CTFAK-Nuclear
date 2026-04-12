@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.MFA;
 using CTFAK.Utils;
 using System;
@@ -16,14 +16,10 @@ namespace CTFAK.CCN.Chunks.Banks
     {
         public bool Compressed;
         public bool Debug;
-        public List<FontItem> Items=new List<FontItem>();
-
-
-
+        public List<FontItem> Items = new List<FontItem>();
 
         public override void Read(ByteReader reader)
         {
-
             if ((Settings.Old || Settings.Fusion3Seed) && !Settings.isMFA) return;//TODO FIX FIX FIX
             var count = reader.ReadInt32();
             int offset = 0;
@@ -32,28 +28,15 @@ namespace CTFAK.CCN.Chunks.Banks
             Items = new List<FontItem>();
             for (int i = 0; i < count; i++)
             {
-                if (Settings.Android) continue;
                 var item = new FontItem();
                 item.Compressed = Compressed;
                 item.Read(reader);
                 item.Handle += (uint)offset;
                 Items.Add(item);
             }
-
-
         }
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt32(Items.Count);
-            foreach (FontItem item in Items)
-            {
-                item.Write(writer);
-            }
-
-        }
-
-
     }
+
     public class FontItem : ChunkLoader
     {
         public bool Compressed;
@@ -61,10 +44,6 @@ namespace CTFAK.CCN.Chunks.Banks
         public int Checksum;
         public int References;
         public LogFont Value;
-
-
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -75,7 +54,7 @@ namespace CTFAK.CCN.Chunks.Banks
                 dataReader = Decompressor.DecompressAsReader(reader, out var decompSize);
             }
             else dataReader = reader;
-            
+
             var currentPos = dataReader.Tell();
             Checksum = dataReader.ReadInt32();
             References = dataReader.ReadInt32();
@@ -85,21 +64,6 @@ namespace CTFAK.CCN.Chunks.Banks
 
 
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt32(Handle);
-            var compressedWriter = new ByteWriter(new MemoryStream());
-            compressedWriter.WriteInt32(Checksum);
-            compressedWriter.WriteInt32(References);
-            compressedWriter.WriteInt32(0);
-            Value.Write(compressedWriter);
-            if (Compressed) Writer.WriteBytes(Decompressor.CompressBlock(compressedWriter.GetBuffer()));
-            else Writer.WriteWriter(compressedWriter);
-        }
-
-
-
     }
 
     public class LogFont : ChunkLoader
@@ -119,13 +83,24 @@ namespace CTFAK.CCN.Chunks.Banks
         private byte _pitchAndFamily;
         private string _faceName;
 
-
-
-
+        public int Height => _height;
+        public int Width => _width;
+        public int Escapement => _escapement;
+        public int Orientation => _orientation;
+        public int Weight => _weight;
+        public byte Italic => _italic;
+        public byte Underline => _underline;
+        public byte StrikeOut => _strikeOut;
+        public byte CharSet => _charSet;
+        public byte OutPrecision => _outPrecision;
+        public byte ClipPrecision => _clipPrecision;
+        public byte Quality => _quality;
+        public byte PitchAndFamily => _pitchAndFamily;
+        public string FaceName => _faceName;
 
         public override void Read(ByteReader reader)
         {
-            _height = reader.ReadInt32();
+            _height = reader.ReadInt32() * -1;
             _width = reader.ReadInt32();
             _escapement = reader.ReadInt32();
             _orientation = reader.ReadInt32();
@@ -140,26 +115,6 @@ namespace CTFAK.CCN.Chunks.Banks
             _pitchAndFamily = reader.ReadByte();
             _faceName = reader.ReadYuniversal(32);
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(_height);
-            Writer.WriteInt32(_width);
-            Writer.WriteInt32(_escapement);
-            Writer.WriteInt32(_orientation);
-            Writer.WriteInt32(_weight);
-            Writer.WriteInt8(_italic);
-            Writer.WriteInt8(_underline);
-            Writer.WriteInt8(_strikeOut);
-            Writer.WriteInt8(_charSet);
-            Writer.WriteInt8(_outPrecision);
-            Writer.WriteInt8(_clipPrecision);
-            Writer.WriteInt8(_quality);
-            Writer.WriteInt8(_pitchAndFamily);
-            Writer.WriteUnicode(_faceName);
-        }
-
-
     }
 
     public class TrueTypeMeta : ChunkLoader
@@ -188,7 +143,7 @@ namespace CTFAK.CCN.Chunks.Banks
             bool Strikeout;
             int ScriptType;
 
-            public void Read (ByteReader reader)
+            public void Read(ByteReader reader)
             {
                 FontSize = reader.ReadInt32();
                 FontSize = -(FontSize + 6);
@@ -208,11 +163,6 @@ namespace CTFAK.CCN.Chunks.Banks
                 reader.ReadInt32(); //Idk Yet
             }
         }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class TrueTypeFonts : ChunkLoader
@@ -224,11 +174,6 @@ namespace CTFAK.CCN.Chunks.Banks
             var end = reader.Tell() + reader.Size();
             while (reader.Tell() < end)
                 Fonts.Add(Decompressor.Decompress(reader, out int decomp));
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
         }
     }
 }

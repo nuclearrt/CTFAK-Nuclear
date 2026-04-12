@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CTFAK.Memory;
 using CTFAK.Utils;
 
@@ -18,16 +18,8 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
 
         }
 
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Timer);
-            Writer.WriteInt32(Loops);
-            Writer.WriteInt16(Comparsion);
-        }
-
         public override string ToString()
         {
-
             return $"Time time: {Timer} loops: {Loops}";
         }
     }

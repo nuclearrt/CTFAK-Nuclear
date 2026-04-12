@@ -1,4 +1,4 @@
-﻿using CTFAK.Core.Utils;
+using CTFAK.Core.Utils;
 using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
@@ -37,7 +37,7 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
                 {
                     var decompSize = decompressedReader.ReadInt32();
                     imageData = Decompressor.DecompressBlock(decompressedReader,
-                        (int)(decompressedReader.Size() - decompressedReader.Tell()));
+                                        (int)(decompressedReader.Size() - decompressedReader.Tell()));
                 }
                 else
                 {

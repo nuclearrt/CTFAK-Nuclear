@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -23,27 +23,27 @@ namespace CTFAK.MFA
         public List<MFAObjectInstance> Instances = new List<MFAObjectInstance>();
         public BitDict Flags = new BitDict(new string[]
         {
-            "GrabDesktop",
-            "KeepDisplay",
-            "BackgroundCollisions",
-            "DisplayFrameTitle",
-            "ResizeToScreen",
-            "ForceLoadOnCall",
-            "NoDisplaySurface",
-            "ScreenSaverSetup",
-            "TimerBasedMovements",
-            "MochiAds",
-            "NoGlobalEvents",
-            "Unk1",
-            "DontInclude",
-            "DontEraseBG",
-            "Unk2",
-            "ForceLoadOnCallIgnore"
+                        "GrabDesktop",
+                        "KeepDisplay",
+                        "BackgroundCollisions",
+                        "DisplayFrameTitle",
+                        "ResizeToScreen",
+                        "ForceLoadOnCall",
+                        "NoDisplaySurface",
+                        "ScreenSaverSetup",
+                        "TimerBasedMovements",
+                        "MochiAds",
+                        "NoGlobalEvents",
+                        "Unk1",
+                        "DontInclude",
+                        "DontEraseBG",
+                        "Unk2",
+                        "ForceLoadOnCallIgnore"
         });
 
         public string Password;
         public string UnkString = "";
-        public List<Color> Palette=new Color[256].ToList();
+        public List<Color> Palette = new Color[256].ToList();
         public int StampHandle;
         public int ActiveLayer;
         public List<MFALayer> Layers = new List<MFALayer>();
@@ -52,86 +52,6 @@ namespace CTFAK.MFA
         public MFATransition FadeIn;
         public MFATransition FadeOut;
         public int PaletteSize;
-        
-        
-
-
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Handle);
-            Writer.AutoWriteUnicode(Name);
-            Console.WriteLine("pos: "+Writer.Tell());
-            Writer.WriteInt32(SizeX);
-            Writer.WriteInt32(SizeY);
-            Writer.WriteColor(Background);
-            
-            Writer.WriteUInt32(Flags.flag);
-            Writer.WriteInt32(MaxObjects);
-            
-            Writer.WriteInt32(0);
-            Writer.WriteInt32(12);
-            Writer.Skip(12);
-            
-            Console.WriteLine("pos: "+Writer.Tell());
-            
-            Writer.WriteInt32(LastViewedX);
-            Writer.WriteInt32(LastViewedY);
-            Writer.WriteInt32(Palette.Count);//WTF HELP 
-
-            foreach (var item in Palette)
-            {
-                Writer.WriteColor(item);
-            }
-
-            Writer.WriteInt32(StampHandle);
-            Writer.WriteInt32(ActiveLayer);
-            Writer.WriteInt32(Layers.Count);
-            foreach (var layer in Layers)
-            {
-                layer.Write(Writer);
-            }
-
-            if (FadeIn != null)
-            {
-                Writer.WriteInt8(1);
-                FadeIn.Write(Writer);
-            }
-            else Writer.Skip(1);
-
-            if (FadeOut != null)
-            {
-                Writer.WriteInt8(1);
-                FadeOut.Write(Writer);
-            }
-            else Writer.Skip(1);
-
-
-            Writer.WriteInt32(Items.Count);
-            foreach (var item in Items)
-            {
-                item.Write(Writer);
-            }
-
-            Writer.WriteInt32(Folders.Count);
-            foreach (var item in Folders)
-            {
-                item.Write(Writer);
-            }
-
-            Writer.WriteInt32(Instances.Count);
-            foreach (var item in Instances)
-            {
-                item.Write(Writer);
-            }
-
-
-            Events.Write(Writer);
-
-            Chunks.Write(Writer);
-        }
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -143,10 +63,10 @@ namespace CTFAK.MFA
             Flags.flag = reader.ReadUInt32();
 
             MaxObjects = reader.ReadInt32();
-            
+
             reader.ReadInt32();//garbage
             var password = reader.ReadBytes(reader.ReadInt32());
-            
+
 
             LastViewedX = reader.ReadInt32();
             LastViewedY = reader.ReadInt32();
@@ -212,9 +132,9 @@ namespace CTFAK.MFA
             Events.Read(reader);
 
 
-            Chunks = new MFAChunks();
+            //Chunks = new MFAChunks();
             // Chunks.Log = true;
-            Chunks.Read(reader);
+            //Chunks.Read(reader);
 
         }
     }

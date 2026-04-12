@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using CTFAK.CCN;
@@ -9,7 +9,7 @@ using CTFAK.Utils;
 
 namespace CTFAK.EXE
 {
-    public class CCNFileReader:IFileReader
+    public class CCNFileReader : IFileReader
     {
         public string Name => "CCN";
         public GameData game;
@@ -31,7 +31,7 @@ namespace CTFAK.EXE
 
         public Dictionary<int, Bitmap> getIcons()
         {
-            return ApkFileReader.androidIcons;
+            return new Dictionary<int, Bitmap>();
         }
 
         public void PatchMethods()

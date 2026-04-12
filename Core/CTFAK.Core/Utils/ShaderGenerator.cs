@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using CTFAK.MMFParser.EXE.Loaders;
 using CTFAK.Utils;
@@ -15,12 +15,8 @@ namespace CTFAK.Core.Utils
             var xmlPath = $"Dumps\\Shaders\\{shaderName}\\{shaderName}.xml";
             Directory.CreateDirectory($"Dumps\\Shaders\\{shaderName}");
 
-
-
             File.WriteAllText(fxPath, shader.Data);
             File.WriteAllText(xmlPath, GenerateXMLContent(shader));
-
-
         }
 
         public static string GenerateXMLContent(Shader shader)
@@ -55,14 +51,7 @@ namespace CTFAK.Core.Utils
             }
             content += $"</effect>\n";
 
-
-
-
-
             return content;
-
-
         }
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -20,7 +20,7 @@ namespace CTFAK.Utils
             str = str.Replace("?", "");
             return str;
         }
-        public static string ReadUniversal(this ByteReader reader, int len=-1)
+        public static string ReadUniversal(this ByteReader reader, int len = -1)
         {
             if (Settings.Unicode) return reader.ReadWideString(len);
             else return reader.ReadAscii(len);
@@ -100,4 +100,3 @@ namespace CTFAK.Utils
         }
     }
 }
-

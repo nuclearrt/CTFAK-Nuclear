@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -76,7 +76,7 @@ namespace CTFAK.Utils
                     position += pad * 2;
                 }
             }
-            else if (mode==2)
+            else if (mode == 2)
             {
                 int pad = GetPadding(width, 3);
                 for (int y = 0; y < height; y++)
@@ -84,7 +84,7 @@ namespace CTFAK.Utils
                     for (int x = 0; x < width; x++)
                     {
                         var newShort = (ushort)(imageData[position] | (imageData[position + 1] << 8));
-                        
+
                         byte a = (byte)((newShort & 0xf) >> 0);
                         byte r = (byte)((newShort & 0xf800) >> 11);
                         byte g = (byte)((newShort & 0x7c0) >> 6);
@@ -113,7 +113,7 @@ namespace CTFAK.Utils
             }
             else if (mode == 3)
             {
-                int pad = GetPadding(width, 3, 4,true);
+                int pad = GetPadding(width, 3, 4, true);
                 for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)
@@ -125,19 +125,19 @@ namespace CTFAK.Utils
                         position += 3;
                     }
                     position += pad;
-                    
+
                     /*if (height * width * 3 != imageData.Length && height * width * 3 + height * 3 != imageData.Length && height * width * 3 + height != imageData.Length)
-                    {
-                        position += 2;
-                    }
-                    else if (height * width * 3 + height * 3 == imageData.Length)
-                    {
-                        position += 3;
-                    }
-                    else if (height * width * 3 + height == imageData.Length)
-                    {
-                        position++;
-                    }*/
+{
+	position += 2;
+}
+else if (height * width * 3 + height * 3 == imageData.Length)
+{
+	position += 3;
+}
+else if (height * width * 3 + height == imageData.Length)
+{
+	position++;
+}*/
                 }
             }
             else if (mode == 4)
@@ -179,10 +179,10 @@ namespace CTFAK.Utils
             var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
-                                 bmp.Width,
-                                 bmp.Height),
-                                 ImageLockMode.WriteOnly,
-                                 bmp.PixelFormat);
+                                                     bmp.Width,
+                                                     bmp.Height),
+                                                     ImageLockMode.WriteOnly,
+                                                     bmp.PixelFormat);
 
             var pNative = bmpData.Scan0;
             Marshal.Copy(colorArray, 0, pNative, colorArray.Length);

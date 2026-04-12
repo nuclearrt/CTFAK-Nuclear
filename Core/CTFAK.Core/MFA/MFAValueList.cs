@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
@@ -22,19 +22,12 @@ namespace CTFAK.MFA
                 Items.Add(item);
             }
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Items.Count);
-            foreach (var item in Items) item.Write(Writer);
-        }
     }
+
     public class ValueItem : ChunkLoader
     {
         public object Value;
         public string Name = "";
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -51,26 +44,6 @@ namespace CTFAK.MFA
                 case 1://double
                     Value = reader.ReadSingle();
                     break;
-            }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.AutoWriteUnicode(Name);
-            if (Value is string)
-            {
-                Writer.WriteInt32(2);
-                Writer.AutoWriteUnicode((string)Value);
-            }
-            else if (Value is int)
-            {
-                Writer.WriteInt32(0);
-                Writer.WriteInt32((int)Value);
-            }
-            else if (Value is double || Value is float)
-            {
-                Writer.WriteInt32(1);
-                Writer.WriteSingle((float)Value);
             }
         }
     }

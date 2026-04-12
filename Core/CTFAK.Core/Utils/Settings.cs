@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +9,7 @@ namespace CTFAK.Utils
     public class Settings
     {
         [Flags]
-        public enum GameType:byte
+        public enum GameType : byte
         {
             NORMAL = 0b00000001,
             MMF2 = 0b00000010,
@@ -29,9 +29,5 @@ namespace CTFAK.Utils
         public static GameType gameType;
         public static bool Old => gameType.HasFlag(GameType.MMF15);
         public static bool TwoFivePlus => gameType.HasFlag(GameType.TWOFIVEPLUS);
-        public static bool Android => gameType.HasFlag(GameType.ANDROID);
-        public static bool F3 => gameType.HasFlag(GameType.F3);
-        public static bool iOS => gameType.HasFlag(GameType.IOS);
-        public static bool Normal => gameType == GameType.NORMAL;
     }
 }

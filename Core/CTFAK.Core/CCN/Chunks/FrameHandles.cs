@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace CTFAK.CCN.Chunks
     public class FrameHandles : ChunkLoader
     {
         public Dictionary<int, int> Items;
-        
+
         public override void Read(ByteReader reader)
         {
             var len = reader.Size() / 2;
@@ -21,12 +21,6 @@ namespace CTFAK.CCN.Chunks
                 var handle = reader.ReadInt16();
                 Items.Add(i, handle);
             }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            foreach (int item in Items.Values)
-                Writer.WriteInt16((short)item);
         }
     }
 }

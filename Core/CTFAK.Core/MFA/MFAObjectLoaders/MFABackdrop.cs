@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
@@ -13,21 +13,13 @@ namespace CTFAK.MFA.MFAObjectLoaders
     {
         public int Handle;
 
-
-
-
         public override void Read(ByteReader reader)
         {
             base.Read(reader);
             Handle = reader.ReadInt32();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            base.Write(Writer);
-            Writer.WriteInt32(Handle);
-        }
     }
+
     public class MFAQuickBackdrop : MFABackgroundLoader
     {
         public int Width;
@@ -40,10 +32,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public Color Color2;
         public int Flags;
         public int Image;
-
-
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -60,22 +48,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
             Flags = reader.ReadInt32();
             Image = reader.ReadInt32();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            base.Write(Writer);
-            Writer.WriteInt32(Width);
-            Writer.WriteInt32(Height);
-            Writer.WriteInt32(Shape);
-            Writer.WriteInt32(BorderSize);
-            Writer.WriteColor(BorderColor);
-
-            Writer.WriteInt32(FillType);
-            Writer.WriteColor(Color1);
-            Writer.WriteColor(Color2);
-            Writer.WriteInt32(Flags);
-            Writer.WriteInt32(Image);
-        }
     }
 
     public class MFABackgroundLoader : ChunkLoader
@@ -87,13 +59,5 @@ namespace CTFAK.MFA.MFAObjectLoaders
             ObstacleType = reader.ReadUInt32();
             CollisionType = reader.ReadUInt32();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt32(ObstacleType);
-            Writer.WriteUInt32(CollisionType);
-        }
-
-
     }
 }

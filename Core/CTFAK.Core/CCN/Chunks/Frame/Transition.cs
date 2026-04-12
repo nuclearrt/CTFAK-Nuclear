@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -18,9 +18,6 @@ namespace CTFAK.CCN.Chunks.Frame
         public string ModuleFile;
         public byte[] ParameterData;
 
-
-
-
         public override void Read(ByteReader reader)
         {
             var currentPos = reader.Tell();
@@ -36,15 +33,6 @@ namespace CTFAK.CCN.Chunks.Frame
             ModuleFile = reader.ReadYuniversal();
             reader.Seek(currentPos + parameterOffset);
             ParameterData = reader.ReadBytes(parameterSize);
-
-
-
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
-        }
-    
     }
 }

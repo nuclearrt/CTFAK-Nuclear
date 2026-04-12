@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
 
@@ -15,7 +15,7 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
         public int Direction;
         public int TypeParent;
         public int ObjectInfoList;
-        public int Layer;            
+        public int Layer;
 
         public override void Read(ByteReader reader)
         {
@@ -29,26 +29,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
             TypeParent = reader.ReadInt16();
             ObjectInfoList = reader.ReadInt16();
             Layer = reader.ReadInt16();
-
-            if (TypeParent == 2)
-            {
-                //ObjectInfoParent = (ushort)((32837 - ObjectInfoParent) / 23);
-                //TypeParent = 0;
-            }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt16((ushort)ObjectInfoParent);
-            Writer.WriteInt16(Flags);
-            Writer.WriteInt16((short) X);
-            Writer.WriteInt16((short) Y);
-            Writer.WriteInt16((short) Slope);
-            Writer.WriteInt16((short) Angle);
-            Writer.WriteInt32(Direction);
-            Writer.WriteInt16((short) TypeParent);
-            Writer.WriteInt16((short) ObjectInfoList);
-            Writer.WriteInt16((short) Layer);
         }
 
         public override string ToString()

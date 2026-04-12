@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN;
+using CTFAK.CCN;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using CTFAK.Memory;
 using CTFAK.Utils;
@@ -20,7 +20,7 @@ namespace CTFAK.CCN.Chunks.Objects
         Box = 1
     }
 
-    public class BackdropLoader:ChunkLoader
+    public class BackdropLoader : ChunkLoader
     {
         public int Size;
         public Obstacle ObstacleType;
@@ -30,11 +30,6 @@ namespace CTFAK.CCN.Chunks.Objects
         public int Image;
 
         public override void Read(ByteReader reader)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Write(ByteWriter writer)
         {
             throw new System.NotImplementedException();
         }
@@ -50,15 +45,10 @@ namespace CTFAK.CCN.Chunks.Objects
             if (!Settings.Old)
             {
                 Width = reader.ReadInt32();
-                Height = reader.ReadInt32(); 
+                Height = reader.ReadInt32();
             }
-                
-            Image = reader.ReadInt16();
-        }
 
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
+            Image = reader.ReadInt16();
         }
     }
 
@@ -75,11 +65,6 @@ namespace CTFAK.CCN.Chunks.Objects
             Height = reader.ReadInt32();
             Shape = new Shape();
             Shape.Read(reader);
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
         }
     }
 
@@ -115,15 +100,8 @@ namespace CTFAK.CCN.Chunks.Objects
                 Color2 = reader.ReadColor();
                 GradFlags = reader.ReadInt16();
             }
-            // else if(FillType==3)
-            // {
-            Image = reader.ReadInt16();
-            // }
-        }
 
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
+            Image = reader.ReadInt16();
         }
     }
 }

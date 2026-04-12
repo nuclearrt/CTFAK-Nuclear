@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
@@ -8,15 +8,15 @@ namespace CTFAK.Memory
 {
     public class ByteReader : BinaryReader
     {
-        public ByteReader(Stream input) : base(input){}
-        public ByteReader(Stream input, Encoding encoding) : base(input, encoding){}
-        public ByteReader(byte[] data) : base(new MemoryStream(data)){}
-        public ByteReader(string path, FileMode fileMode) : base(new FileStream(path, fileMode)){}
-        public void Seek(Int64 offset, SeekOrigin seekOrigin = SeekOrigin.Begin)=>BaseStream.Seek(offset, seekOrigin);
-        public void Skip(Int64 count)=>BaseStream.Seek(count, SeekOrigin.Current);
-        public Int64 Tell()=>BaseStream.Position;
-        public Int64 Size()=>BaseStream.Length;
-        public bool HasMemory(int size)=>Size() - Tell() >= size;
+        public ByteReader(Stream input) : base(input) { }
+        public ByteReader(Stream input, Encoding encoding) : base(input, encoding) { }
+        public ByteReader(byte[] data) : base(new MemoryStream(data)) { }
+        public ByteReader(string path, FileMode fileMode) : base(new FileStream(path, fileMode)) { }
+        public void Seek(Int64 offset, SeekOrigin seekOrigin = SeekOrigin.Begin) => BaseStream.Seek(offset, seekOrigin);
+        public void Skip(Int64 count) => BaseStream.Seek(count, SeekOrigin.Current);
+        public Int64 Tell() => BaseStream.Position;
+        public Int64 Size() => BaseStream.Length;
+        public bool HasMemory(int size) => Size() - Tell() >= size;
 
 
 
@@ -99,7 +99,7 @@ namespace CTFAK.Memory
         public string ReadYuniversal(int len = -1)
         {
             if (Settings.Unicode)
-                return ReadWideString(len); 
+                return ReadWideString(len);
             else
                 return ReadAscii(len);
         }

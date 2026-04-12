@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Xml.Schema;
 using CTFAK.Memory;
@@ -12,15 +12,11 @@ namespace CTFAK.CCN.Chunks.Objects
         public int Height;
         public List<Paragraph> Items = new List<Paragraph>();
 
-
-
-
-
         public override void Read(ByteReader reader)
         {
             if (Settings.Old)
             {
-                
+
                 var currentPos = reader.Tell();
                 var size = reader.ReadInt32();
                 Width = reader.ReadInt16();
@@ -33,11 +29,11 @@ namespace CTFAK.CCN.Chunks.Objects
                 }
                 foreach (int itemOffset in itemOffsets)
                 {
-                    reader.Seek(currentPos+itemOffset);
+                    reader.Seek(currentPos + itemOffset);
                     var par = new Paragraph();
                     par.Read(reader);
                     Items.Add(par);
-                } 
+                }
             }
             else
             {
@@ -53,17 +49,12 @@ namespace CTFAK.CCN.Chunks.Objects
                 }
                 foreach (int itemOffset in itemOffsets)
                 {
-                    reader.Seek(currentPos+itemOffset);
+                    reader.Seek(currentPos + itemOffset);
                     var par = new Paragraph();
                     par.Read(reader);
                     Items.Add(par);
-                } 
+                }
             }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
         }
     }
 
@@ -71,22 +62,18 @@ namespace CTFAK.CCN.Chunks.Objects
     {
         public ushort FontHandle;
         public BitDict Flags = new BitDict(new string[]{
-            "HorizontalCenter",
-            "RightAligned",
-            "VerticalCenter",
-            "BottomAligned",
-            "None", "None", "None", "None",
-            "Correct",
-            "Relief"});
+                        "HorizontalCenter",
+                        "RightAligned",
+                        "VerticalCenter",
+                        "BottomAligned",
+                        "None", "None", "None", "None",
+                        "Correct",
+                        "Relief"});
         public string Value;
         public Color Color;
 
-
-
-
         public override void Read(ByteReader reader)
         {
-
             if (Settings.Old)
             {
                 var size = reader.ReadUInt16();
@@ -103,15 +90,6 @@ namespace CTFAK.CCN.Chunks.Objects
                 Color = reader.ReadColor();
                 Value = reader.ReadYuniversal();
             }
-            
-
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
-        }
-
-
     }
 }

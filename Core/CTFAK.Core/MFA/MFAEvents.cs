@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CTFAK.CCN.Chunks;
 using CTFAK.CCN.Chunks.Frame;
 using CTFAK.Memory;
@@ -20,17 +21,17 @@ namespace CTFAK.MFA
         public const string EditorLineData = "EvLs";
         public const string UnknownEventData = "E2Ts";
         public const string EventEnd = "!DNE";
-        public List<EventGroup> Items=new List<EventGroup>();
+        public List<EventGroup> Items = new List<EventGroup>();
         public ushort Version;
         public ushort FrameType;
-        public List<Comment> Comments=new List<Comment>();
-        public List<EventObject> Objects=new List<EventObject>();
+        public List<Comment> Comments = new List<Comment>();
+        public List<EventObject> Objects = new List<EventObject>();
         public ushort ConditionWidth;
         public ushort ObjectHeight;
-        public List<ushort> ObjectTypes=new List<ushort>();
-        public List<ushort> ObjectHandles=new List<ushort>();
-        public List<ushort> ObjectFlags=new List<ushort>();
-        public List<string> Folders=new List<string>();
+        public List<ushort> ObjectTypes = new List<ushort>();
+        public List<ushort> ObjectHandles = new List<ushort>();
+        public List<ushort> ObjectFlags = new List<ushort>();
+        public List<string> Folders = new List<string>();
         public uint X;
         public uint Y;
         public uint CaretType;
@@ -47,25 +48,24 @@ namespace CTFAK.MFA
         public byte[] _cache;
         public bool _ifMFA;
 
-
-
-
-
         public override void Read(ByteReader reader)
         {
+            uint size = reader.ReadUInt32();
+            long endOffset = reader.Tell() + size;
+            if (size == 0)
+                return;
 
-            Version = reader.ReadUInt16();
-            FrameType = reader.ReadUInt16();
             Items = new List<EventGroup>();
 
             while (true)
             {
-
                 string name = reader.ReadAscii(4);
-                if (name == EventData)
+
+                if (name == EventData || name == "STVE")
                 {
                     EventDataLen = reader.ReadUInt32();
                     uint end = (uint)(reader.Tell() + EventDataLen);
+
                     while (true)
                     {
                         EventGroup evGrp = new EventGroup();
@@ -73,29 +73,37 @@ namespace CTFAK.MFA
                         evGrp.Read(reader);
                         Items.Add(evGrp);
                         if (reader.Tell() >= end) break;
+
+                        //MFA global events have 2 bytes of padding at the end
+                        if (reader.Tell() == end - 2)
+                        {
+                            reader.Skip(2);
+                            break;
+                        }
                     }
                 }
-                else if (name == CommentData)
+                else if (name == CommentData || name == "SMER")
                 {
-                    try
+                    Comments = new List<Comment>(reader.ReadInt32());
+                    for (int i = 0; i < Comments.Capacity; i++)
                     {
-                        CommentDataLen = reader.ReadUInt32();
-                        Comments = new List<Comment>();
                         Comment comment = new Comment();
                         comment.Read(reader);
                         Comments.Add(comment);
                     }
-                    catch
+                }
+                else if (name == "SPRG")
+                {
+                    Items = new List<EventGroup>(reader.ReadInt32());
+                    reader.Skip(4);
+                    for (int i = 0; i < Items.Capacity; i++)
                     {
-                        //What the fuck?
-
-                        /*
-                        import code
-                        code.interact(local = locals())
-                        */
+                        EventGroup eventGroup = new EventGroup();
+                        eventGroup.Read(reader);
+                        Items.Add(eventGroup);
                     }
                 }
-                else if (name == ObjectData)
+                else if (name == ObjectData || name == "SJBO")
                 {
                     Objects = new List<EventObject>();
                     uint len = reader.ReadUInt32();
@@ -170,9 +178,9 @@ namespace CTFAK.MFA
                     EventLine = reader.ReadUInt32();
                     EventLineY = reader.ReadUInt32();
                 }
-                else if (name == UnknownEventData)
+                else if (name == UnknownEventData || name == "TYAL")
                 {
-                    reader.Skip(12);
+                    reader.Skip(reader.ReadInt32());
                 }
                 else if (name == EventEnd)
                 {
@@ -180,151 +188,22 @@ namespace CTFAK.MFA
 
                     break;
                 }
-                else Logger.Log("UnknownGroup: " + name);//throw new NotImplementedException("Fuck Something is Broken: "+name);
+                else Logger.Log("UnknownGroup: " + name);
 
             }
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-
-            Writer.WriteUInt16(Version);
-            Writer.WriteUInt16(FrameType);
-            if (Items.Count > 0)
-            {
-                Writer.WriteAscii(EventData);
-
-                ByteWriter newWriter = new ByteWriter(new MemoryStream());
-                //Writer.WriteUInt32(EventDataLen);
-
-                foreach (EventGroup eventGroup in Items)
-                {
-                    eventGroup.isMFA = true;
-                    eventGroup.Write(newWriter);
-                }
-
-
-                Writer.WriteUInt32((uint)newWriter.BaseStream.Position);
-                Writer.WriteWriter(newWriter);
-
-            }
-
-
-            if (Objects?.Count > 0)
-            {
-                Writer.WriteAscii(ObjectData);
-                Writer.WriteUInt32((uint)Objects.Count);
-                foreach (EventObject eventObject in Objects)
-                {
-                    eventObject.Write(Writer);
-                }
-            }
-            if (ObjectTypes != null)
-            {
-                Writer.WriteAscii(ObjectListData);
-                Writer.WriteInt16(-1);
-                Writer.WriteInt16((short)ObjectTypes.Count);
-                foreach (ushort objectType in ObjectTypes)
-                {
-                    Writer.WriteUInt16(objectType);
-                }
-
-                foreach (ushort objectHandle in ObjectHandles)
-                {
-                    Writer.WriteUInt16(objectHandle);
-                }
-
-                foreach (ushort objectFlag in ObjectFlags)
-                {
-                    Writer.WriteUInt16(objectFlag);
-                }
-
-                Writer.WriteUInt16((ushort)Folders.Count);
-                foreach (string folder in Folders)
-                {
-                    Writer.AutoWriteUnicode(folder);
-                }
-            }
-
-
-
-
-
-            // if (X != 0)
-            {
-                Writer.WriteAscii(EditorPositionData);
-                Writer.WriteInt16(10);
-                Writer.WriteInt32((int)X);
-                Writer.WriteInt32((int)Y);
-                Writer.WriteUInt32(CaretType);
-                Writer.WriteUInt32(CaretX);
-                Writer.WriteUInt32(CaretY);
-            }
-            // if (LineY != 0)
-            {
-                Writer.WriteAscii(EditorLineData);
-                Writer.WriteInt16(10);
-                Writer.WriteUInt32(LineY);
-                Writer.WriteUInt32(LineItemType);
-                Writer.WriteUInt32(EventLine);
-                Writer.WriteUInt32(EventLineY);
-            }
-            Writer.WriteAscii(UnknownEventData);
-            Writer.WriteInt8(8);
-            Writer.Skip(9);
-            Writer.WriteInt16(0);
-
-            Writer.WriteAscii(EventEditorData);
-            // Writer.Skip(4+2*2+4*3);
-            Writer.WriteInt32(EditorDataUnk);
-            Writer.WriteInt16((short)ConditionWidth);
-            Writer.WriteInt16((short)ObjectHeight);
-            Writer.Skip(12);
-
-
-            Writer.WriteAscii(EventEnd);
-
-            // Writer.WriteBytes(_cache);
-
-
-
-            //TODO: Fix commented part
-            // 
-
-            //
-            // if (Comments != null)
-            // {
-            //     Console.WriteLine("Writing Comments");
-            //     Writer.WriteAscii(CommentData);
-            //     foreach (Comment comment in Comments)
-            //     {
-            //         comment.Write(Writer);
-            //     }
-            // }
-
-        }
-
-
     }
 
     public class Comment : ChunkLoader
     {
         public uint Handle;
         public string Value;
-        
+
         public override void Read(ByteReader reader)
         {
             Handle = reader.ReadUInt32();
             Value = reader.AutoReadUnicode();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt32(Handle);
-            Writer.AutoWriteUnicode(Value);
-        }
-
-
     }
 
     public class EventObject : ChunkLoader
@@ -338,11 +217,8 @@ namespace CTFAK.MFA
         public uint ItemHandle;
         public uint InstanceHandle;
         public string Code;
-        public string IconBuffer;
+        public byte[] IconBuffer;
         public ushort SystemQualifier;
-
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -363,7 +239,7 @@ namespace CTFAK.MFA
                 //Logger.Log("Code: " + Code);
                 if (Code == "OIC2")//IconBufferCode
                 {
-                    IconBuffer = reader.AutoReadUnicode();
+                    IconBuffer = reader.ReadBytes(reader.ReadInt32());
                 }
             }
             if (ObjectType == 3) //SystemItemType
@@ -372,37 +248,5 @@ namespace CTFAK.MFA
             }
 
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt32(Handle);
-            Writer.WriteUInt16(ObjectType);
-            Writer.WriteUInt16(ItemType);
-            Writer.AutoWriteUnicode(Name);//Not Sure
-            Writer.AutoWriteUnicode(TypeName);//Not Sure
-            Writer.WriteUInt16(Flags);
-            if (ObjectType == 1)
-            {
-                Writer.WriteUInt32(ItemHandle);
-                Writer.WriteUInt32(InstanceHandle);
-            }
-            else if (ObjectType == 2)
-            {
-                // Code = "OIC2";
-                Writer.WriteAscii(Code);
-                if (Code == "OIC2")
-                {
-                    Writer.AutoWriteUnicode(IconBuffer);
-                }
-            }
-            if (ObjectType == 3)
-            {
-                Writer.WriteUInt16(SystemQualifier);
-            }
-
-
-        }
-
-
     }
 }

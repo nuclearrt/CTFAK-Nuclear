@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using CTFAK.Memory;
 using CTFAK.Utils;
@@ -8,7 +8,11 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
     public class Group : ParameterCommon
     {
         public long Offset;
-        public ushort Flags;
+        public BitDict Flags = new BitDict(new string[]
+        {
+            "InactiveOnStart",
+            "Closed"
+        });
         public ushort Id;
         public string Name;
         public int Password;
@@ -50,27 +54,15 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
         public override void Read(ByteReader reader)
         {
             Offset = reader.Tell() - 24;
-            Flags = reader.ReadUInt16();
+            Flags.flag = reader.ReadUInt16();
             Id = reader.ReadUInt16();
             Name = reader.ReadWideString();
             if (Settings.Build >= 293) Name = "Group " + Id;
             //Name = "InvalidGroup_" + Id;
-            Unk1 = reader.ReadBytes(190-Name.Length*2);
+            Unk1 = reader.ReadBytes(190 - Name.Length * 2);
             //Password = reader.ReadInt32();
             //reader.ReadInt16();
 
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt16(Flags);
-            Writer.WriteUInt16(Id);
-            Writer.WriteUnicode(Name, true);
-            Writer.WriteBytes(Unk1);
-
-            Password = (int)generateChecksum(Name, "");
-            Writer.WriteInt32(Password);
-            Writer.WriteInt16(0);
         }
 
         public override string ToString()

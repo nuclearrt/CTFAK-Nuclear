@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace CTFAK.CCN.Chunks
 {
     public static class ChunkList
     {
         public static Dictionary<int, string> ChunkNames = new Dictionary<int, string>()
-        {
-            { 4386,  "Preview" },                        // 0x1122
+                {
+                        { 4386,  "Preview" },                        // 0x1122
             { 8738,  "Mini-Header" },                    // 0x2222
             { 8739,  "Header" },                         // 0x2223
             { 8740,  "Name" },                           // 0x2224

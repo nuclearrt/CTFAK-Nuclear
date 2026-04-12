@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
@@ -15,10 +15,6 @@ namespace CTFAK.CCN.Chunks
         public List<byte> AccelShift;
         public List<short> AccelKey;
         public List<short> AccelId;
-
-
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -46,39 +42,6 @@ namespace CTFAK.CCN.Chunks
                 AccelId.Add(reader.ReadInt16());
                 reader.Skip(2);
             }
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt32(20);
-            writer.WriteInt32(20);
-            //writer.WriteInt32(0);
-
-            ByteWriter menuDataWriter = new ByteWriter(new MemoryStream());
-
-            foreach (AppMenuItem item in Items)
-            {
-                item.Write(menuDataWriter);
-            }
-
-
-            writer.WriteUInt32((uint)menuDataWriter.BaseStream.Position + 4);
-            //
-
-            writer.WriteUInt32((uint)(24 + menuDataWriter.BaseStream.Position));
-            writer.WriteInt32(AccelKey.Count * 8);
-            writer.WriteInt32(0);
-            writer.WriteWriter(menuDataWriter);
-
-            for (Int32 i = 0; i < AccelKey.Count; i++)
-            {
-                writer.WriteInt8(AccelShift[i]);
-                writer.WriteInt8(0);
-                writer.WriteInt16(AccelKey[i]);
-                writer.WriteInt16(AccelId[i]);
-                writer.WriteInt16(0);
-            }
-
         }
 
         public void Load(ByteReader reader)
@@ -110,8 +73,6 @@ namespace CTFAK.CCN.Chunks
         public Int16 Id = 0;
         public string Mnemonic = null;
 
-
-
         public override void Read(ByteReader reader)
         {
             Flags = reader.ReadInt16();
@@ -131,29 +92,6 @@ namespace CTFAK.CCN.Chunks
                     break;
                 }
             }
-
-
-        }
-
-        public void Load()
-        {
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt16(Flags);
-            if (!ByteFlag.GetFlag((uint)Flags, 4))
-            {
-                writer.WriteInt16(Id);
-            }
-
-            String MName = Name;
-            if (Mnemonic != null)
-            {
-                MName = MName.ReplaceFirst(Mnemonic, "&" + Mnemonic);
-            }
-
-            writer.WriteUnicode(MName, true);
         }
     }
 }

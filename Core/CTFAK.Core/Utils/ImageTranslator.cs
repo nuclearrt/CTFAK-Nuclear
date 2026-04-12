@@ -1,4 +1,4 @@
-﻿using System.Drawing.Imaging;
+using System.Drawing.Imaging;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System;
@@ -46,9 +46,9 @@ namespace CTFAK.Core.Utils
                     colorArray[newPos + 3] = 255;
                     if (!alpha)
                     {
-                        if (colorArray[newPos + 0] == transparent.R && 
-                            colorArray[newPos + 1] == transparent.G &&
-                            colorArray[newPos + 2] == transparent.B)
+                        if (colorArray[newPos + 0] == transparent.R &&
+                                colorArray[newPos + 1] == transparent.G &&
+                                colorArray[newPos + 2] == transparent.B)
                             colorArray[newPos + 3] = 0;
                     }
                     position += 3;
@@ -99,9 +99,9 @@ namespace CTFAK.Core.Utils
                     colorArray[newPos + 3] = 255;
                     if (!alpha)
                     {
-                        if (colorArray[newPos + 2] == transparent.R && 
-                            colorArray[newPos + 1] == transparent.G &&
-                            colorArray[newPos + 0] == transparent.B)
+                        if (colorArray[newPos + 2] == transparent.R &&
+                                colorArray[newPos + 1] == transparent.G &&
+                                colorArray[newPos + 0] == transparent.B)
                             colorArray[newPos + 3] = 0;
                     }
                     position += 2;
@@ -151,9 +151,9 @@ namespace CTFAK.Core.Utils
                     colorArray[newPos + 3] = 255;
                     if (!alpha)
                     {
-                        if (colorArray[newPos + 2] == transparent.R && 
-                            colorArray[newPos + 1] == transparent.G &&
-                            colorArray[newPos + 0] == transparent.B)
+                        if (colorArray[newPos + 2] == transparent.R &&
+                                colorArray[newPos + 1] == transparent.G &&
+                                colorArray[newPos + 0] == transparent.B)
                             colorArray[newPos + 3] = 0;
                     }
                     position += 2;
@@ -375,8 +375,8 @@ namespace CTFAK.Core.Utils
                     else
                     {
                         if (imageData[newPos + 2] == transparent.R &&
-                            imageData[newPos + 1] == transparent.G &&
-                            imageData[newPos + 0] == transparent.B)
+                                imageData[newPos + 1] == transparent.G &&
+                                imageData[newPos + 0] == transparent.B)
                             colorArray[newPos + 3] = 0;
                     }
                     position += 4;

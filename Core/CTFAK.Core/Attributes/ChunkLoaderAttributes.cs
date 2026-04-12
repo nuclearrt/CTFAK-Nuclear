@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using CTFAK.Utils;
 
 namespace CTFAK.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class ChunkLoaderAttribute:Attribute
+    public class ChunkLoaderAttribute : Attribute
     {
         public int chunkId;
         public string chunkName;

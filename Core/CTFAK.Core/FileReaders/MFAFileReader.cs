@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using CTFAK.CCN;
@@ -20,6 +20,11 @@ namespace CTFAK.EXE
             return game;
         }
 
+        public MFAData getMfaData()
+        {
+            return mfa;
+        }
+
         public int ReadHeader(ByteReader reader)
         {
             throw new System.NotImplementedException();
@@ -32,7 +37,6 @@ namespace CTFAK.EXE
             Settings.isMFA = true;
             mfa.Read(reader);
             Settings.isMFA = false;
-            game = MFA2Pame.ConvertMFA2Pame(mfa);
         }
 
         public Dictionary<int, Bitmap> getIcons()

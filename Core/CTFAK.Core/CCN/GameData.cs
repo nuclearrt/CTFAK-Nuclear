@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.CCN.Chunks.Banks;
 using CTFAK.CCN.Chunks.Frame;
 using CTFAK.CCN.Chunks.Objects;
@@ -14,7 +14,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CTFAK.EXE;
 using CTFAK.MMFParser.EXE.Loaders;
-using Ionic.Zlib;
 using CTFAK.FileReaders;
 using CTFAK.Core.CCN.Chunks;
 using System.Reflection.Metadata.Ecma335;
@@ -35,7 +34,7 @@ namespace CTFAK.CCN
         public int productBuild;
 
         public string name;
-        public string author="";
+        public string author = "";
         public string copyright;
         public string aboutText;
         public string doc;
@@ -53,18 +52,17 @@ namespace CTFAK.CCN
 
         public ChunkOffsets chunkOffsets;
 
-        public FontBank Fonts;
-        public SoundBank Sounds;
-        public MusicBank Music;
+        public FontBank Fonts = new FontBank();
+        public SoundBank Sounds = new SoundBank();
+        public MusicBank Music = new MusicBank();
         public ImageBank Images = new ImageBank();
 
-        public Dictionary<int,ObjectInfo> frameitems = new Dictionary<int, ObjectInfo>();
+        public Dictionary<int, ObjectInfo> frameitems = new Dictionary<int, ObjectInfo>();
 
-        public List<Frame> frames = new List<Frame>();
+        public List<Frame> Frames = new List<Frame>();
         public FrameHandles frameHandles;
         public Extensions extensions;
 
-        public PackData packData = new PackData();
         public Shaders shaders = new Shaders();
         public GlobalStrings globalStrings;
         public GlobalValues globalValues;
@@ -74,19 +72,12 @@ namespace CTFAK.CCN
 
         public void Read(ByteReader reader)
         {
-            Logger.Log($"Running {builddate} build.", false);
             string magic = reader.ReadAscii(4); //Reading header
-            //Checking for header
+                                                //Checking for header
             if (magic == "PAMU") Settings.Unicode = true;//PAMU
             else if (magic == "PAME") Settings.Unicode = false;//PAME
             else if (magic == "CRUF") Settings.gameType = Settings.GameType.F3;
-            else Logger.Log("Couldn't found any known headers: "+magic, true, ConsoleColor.Red);//Header not found
-            if (CTFAKCore.parameters.Contains("-f1.5"))
-                Settings.gameType = Settings.GameType.MMF15;
-            if (CTFAKCore.parameters.Contains("-android"))
-                Settings.gameType = Settings.GameType.ANDROID;
-            if (CTFAKCore.parameters.Contains("-f3"))
-                Settings.gameType = Settings.GameType.F3;
+            else Logger.Log("Couldn't found any known headers: " + magic, true, ConsoleColor.Red);//Header not found
             Logger.Log("Game Header: " + magic);
             runtimeVersion = (short)reader.ReadUInt16();
             runtimeSubversion = (short)reader.ReadUInt16();
@@ -100,29 +91,28 @@ namespace CTFAK.CCN
             int chunkIndex = 0;
             int frameIndex = 0;
             List<Task> readingTasks = new List<Task>();
-            while(true)
+            while (true)
             {
-                OnChunkLoaded?.Invoke(chunkIndex,0);
+                OnChunkLoaded?.Invoke(chunkIndex, 0);
                 if (reader.Tell() >= reader.Size()) break;
                 var newChunk = new Chunk();
                 var chunkData = newChunk.Read(reader);
-                if (newChunk.Id == 32494 && Settings.F3) Settings.Fusion3Seed = true;
                 if (CTFAKCore.parameters.Contains("-onlyimages"))
                 {
                     if (newChunk.Id != 26214 && // Image Bank
-                        newChunk.Id != 13107 && // Frame
-                        newChunk.Id != 8745  && // Frame Items
-                        newChunk.Id != 8767  && // Frame Items 2
-                        newChunk.Id != 8787  && // Frame Items 2.5+
-                        newChunk.Id != 8788  && // Frame Item Names 2.5+
-                        newChunk.Id != 8790  && // Frame Item Properties 2.5+
-                        newChunk.Id != 8763  && // Copyright
-                        newChunk.Id != 8750  && // Editor Filename
-                        newChunk.Id != 8740)    // App Name 
+                            newChunk.Id != 13107 && // Frame
+                            newChunk.Id != 8745 && // Frame Items
+                            newChunk.Id != 8767 && // Frame Items 2
+                            newChunk.Id != 8787 && // Frame Items 2.5+
+                            newChunk.Id != 8788 && // Frame Item Names 2.5+
+                            newChunk.Id != 8790 && // Frame Item Properties 2.5+
+                            newChunk.Id != 8763 && // Copyright
+                            newChunk.Id != 8750 && // Editor Filename
+                            newChunk.Id != 8740)    // App Name 
                         continue;
                 }
                 //if (newChunk.Id == 32639) break;
-                if (newChunk.Id == 8787 && !Settings.F3) Settings.gameType = Settings.GameType.TWOFIVEPLUS;
+                if (newChunk.Id == 8787) Settings.gameType = Settings.GameType.TWOFIVEPLUS;
                 var chunkReader = new ByteReader(chunkData);
                 chunkIndex++;
                 string chunkName = "";
@@ -134,8 +124,8 @@ namespace CTFAK.CCN
                     }
 
                     Logger.Log(
-                        $"Encountered chunk: {chunkName}, chunk flag: {newChunk.Flag}, exe size: {newChunk.Size}, decompressed size: {chunkData.Length}");
-                    File.WriteAllBytes($"CHUNK_TRACE\\{gameExeName}\\{chunkName}-{chunkIndex}.bin",chunkData);
+                            $"Encountered chunk: {chunkName}, chunk flag: {newChunk.Flag}, exe size: {newChunk.Size}, decompressed size: {chunkData.Length}");
+                    File.WriteAllBytes($"CHUNK_TRACE\\{gameExeName}\\{chunkName}-{chunkIndex}.bin", chunkData);
                     Logger.Log($"Raw chunk data written to CHUNK_TRACE\\{gameExeName}\\{chunkName}-{chunkIndex}.bin");
                 }
                 string log = $"Reading Chunk {newChunk.Id}";
@@ -143,7 +133,7 @@ namespace CTFAK.CCN
                     log += $" ({chunkName})";
                 if (CTFAKCore.parameters.Contains("-chunk_info"))
                     log += $" (Size: {newChunk.Size}) (Offset: {reader.Tell() - newChunk.Size})";
-                Logger.Log(log);
+                //Logger.Log(log);
                 switch (newChunk.Id)
                 {
                     case 8739:
@@ -248,7 +238,7 @@ namespace CTFAK.CCN
                             newObject.Flags = chunkReader.ReadInt16();
                             chunkReader.Skip(2);
                             newObject.InkEffect = chunkReader.ReadByte();
-                            if(newObject.InkEffect!=1)
+                            if (newObject.InkEffect != 1)
                             {
                                 chunkReader.Skip(3);
                                 var r = chunkReader.ReadByte();
@@ -266,7 +256,7 @@ namespace CTFAK.CCN
                             }
 
                             //Logger.Log("New Frame Item: " + newObject.handle);
-                            frameitems.Add(newObject.handle,newObject);
+                            frameitems.Add(newObject.handle, newObject);
                         }
                         break;
                     case 8788: //2.5+ object names:
@@ -295,7 +285,7 @@ namespace CTFAK.CCN
                                 continue;
                             }
                             var obj = frameitems[shdrcurrent];
-                                
+
                             var shaderHandle = chunkReader.ReadInt32();
                             var numberOfParams = chunkReader.ReadInt32();
                             if (shaders == null) break;
@@ -335,7 +325,7 @@ namespace CTFAK.CCN
                         break;
                     case 8790: //2.5+ object properties
                         var start = chunkReader.Tell();
-                            
+
                         var end = start + chunkReader.Size();
                         chunkReader.ReadInt32();
                         int current = 0;
@@ -344,7 +334,7 @@ namespace CTFAK.CCN
                             var currentPosition = chunkReader.Tell();
                             var chunkSize = chunkReader.ReadInt32();
                             var data = chunkReader.ReadBytes(chunkSize);
-                            var decompressed = ZlibStream.UncompressBuffer(data);
+                            var decompressed = Decompressor.DecompressBlock(data);
                             var decompressedReader = new ByteReader(decompressed);
 
                             var objectData = frameitems[current];
@@ -355,8 +345,8 @@ namespace CTFAK.CCN
                                 objectData.properties = new Backdrop();
                             else objectData.properties = new ObjectCommon(null);
                             objectData.properties.Read(decompressedReader);
-                            chunkReader.Seek(currentPosition+chunkSize+8);
-                               
+                            chunkReader.Seek(currentPosition + chunkSize + 8);
+
                             current++;
                         }
                         break;
@@ -369,8 +359,11 @@ namespace CTFAK.CCN
                             break;
                         var frame = new Frame();
                         frame.Read(chunkReader);
-                        OnFrameLoaded?.Invoke(frames.Count,header.NumberOfFrames);
-                        frames.Add(frame);
+                        OnFrameLoaded?.Invoke(Frames.Count, header.NumberOfFrames);
+                        if (frame.flags.GetFlag("DontInclude"))
+                            break;
+                        Logger.Log($"Frame Found: {frame.name}.");
+                        Frames.Add(frame);
                         break;
                     case 17664:
                         var ImageShapes = new ImageShapes();
@@ -393,23 +386,14 @@ namespace CTFAK.CCN
                         Sounds = new SoundBank();
 
                         if (CTFAKCore.parameters.Contains("-nosounds")) break;
-                        if (Settings.gameType == Settings.GameType.ANDROID)
-                        {
-                            Sounds = ApkFileReader.androidSoundBank;
-                            var AndroidSounds = new AndroidSoundBank();
-                            AndroidSounds.Read(chunkReader);
-                            for (int i = 0; i < Sounds.Items.Count; i++)
-                                Sounds.Items[i].Name = AndroidSounds.Items[Sounds.Items[i].Handle].Name;
-                        }
-                        else
-                            Sounds.Read(chunkReader);
+                        Sounds.Read(chunkReader);
                         break;
                     case 26217: // old 21217 (invalid)
                         /*Music = new MusicBank();
-                        Music.Read(chunkReader);*/ //Actually go fuck yourself Log0
+Music.Read(chunkReader);*/
                         break;
                     default:
-                        Logger.Log("No Reader for Chunk " + newChunk.Id);
+                        //Logger.Log("No Reader for Chunk " + newChunk.Id);
                         if (CTFAKCore.parameters.Contains("-dumpnewchunks"))
                             File.WriteAllBytes("UnkChunks\\" + newChunk.Id + ".bin", chunkReader.ReadBytes());
                         break;

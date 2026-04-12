@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -24,8 +24,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public List<int> Images;
         public uint Font;
 
-
-
         public override void Read(ByteReader reader)
         {
             base.Read(reader);
@@ -49,32 +47,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
 
             Font = reader.ReadUInt32();
 
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            base.Write(Writer);
-            Writer.WriteInt32(Value);
-            Writer.WriteInt32(Minimum);
-            Writer.WriteInt32(Maximum);
-            Writer.WriteUInt32(DisplayType);
-            Writer.WriteUInt32(CountFlags);
-            Writer.WriteColor(Color1); ;
-            Writer.WriteColor(Color2); ;
-            Writer.WriteUInt32(VerticalGradient);
-            Writer.WriteInt32(CountType);
-            Writer.WriteInt32(Width);
-            Writer.WriteInt32(Height);
-            Writer.WriteInt32(Images?.Count ?? 0);
-            if (Images != null)
-            {
-                foreach (var item in Images)
-                {
-                    Writer.WriteUInt32((uint)item);
-                }
-            }
-            else Writer.WriteInt32(0);
-            Writer.WriteUInt32(Font);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
@@ -65,37 +65,37 @@ namespace CTFAK.Core.CCN.Chunks
     {
         public BitDict Flags = new BitDict(new string[]
         {
-            "KeepScreenRatio", "1",
-            "AntiAliasingWhenResizing", "2", "3",
-            "RightToLeftReading", "4",
-            "RightToLeftLayout", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
-            "DontOptimizeStrings", "19", "20", "21",
-            "DontIgnoreDestroy",
-            "DisableIME",
-            "ReduceCPUUsage", "22",
-            "PremultipliedAlpha",
-            "OptimizePlaySample"
+                        "KeepScreenRatio", "1",
+                        "AntiAliasingWhenResizing", "2", "3",
+                        "RightToLeftReading", "4",
+                        "RightToLeftLayout", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
+                        "DontOptimizeStrings", "19", "20", "21",
+                        "DontIgnoreDestroy",
+                        "DisableIME",
+                        "ReduceCPUUsage", "22",
+                        "PremultipliedAlpha",
+                        "OptimizePlaySample"
         });
 
         public BitDict CompressionFlags = new BitDict(new string[]
         {
-            "CompressionLevelMax",
-            "CompressSounds",
-            "IncludeExternalFiles",
-            "NoAutoImageFilters",
-            "NoAutoSoundFilters", "1", "2", "3",
-            "DontDisplayBuildWarning",
-            "OptimizeImageSize",
+                        "CompressionLevelMax",
+                        "CompressSounds",
+                        "IncludeExternalFiles",
+                        "NoAutoImageFilters",
+                        "NoAutoSoundFilters", "1", "2", "3",
+                        "DontDisplayBuildWarning",
+                        "OptimizeImageSize",
         });
 
         public BitDict ViewFlags = new BitDict(new string[]
         {
-            "1"
+                        "1"
         });
 
         public BitDict NewFlags = new BitDict(new string[]
         {
-            "1"
+                        "1"
         });
 
         public byte BuildType;
@@ -152,11 +152,6 @@ namespace CTFAK.Core.CCN.Chunks
             ViewFlags.flag = (uint)reader.ReadInt16();
             NewFlags.flag = (uint)reader.ReadInt16();
         }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class ImageShapes : ChunkLoader
@@ -167,17 +162,12 @@ namespace CTFAK.Core.CCN.Chunks
         public override void Read(ByteReader reader)
         {
             Count = reader.ReadInt32();
-            for (int i = 0; i < Count; i++) 
+            for (int i = 0; i < Count; i++)
             {
                 var shape = new ImageShape();
                 shape.Read(reader);
                 Shapes.Add(shape);
             }
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
         }
     }
 
@@ -203,11 +193,6 @@ namespace CTFAK.Core.CCN.Chunks
                 }
             }
         }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class ChunkOffsets : ChunkLoader
@@ -223,11 +208,6 @@ namespace CTFAK.Core.CCN.Chunks
             FontBankOffset = reader.ReadInt32();
             SoundBankOffset = reader.ReadInt32();
             LastOffset = reader.ReadInt32();
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
         }
     }
 }

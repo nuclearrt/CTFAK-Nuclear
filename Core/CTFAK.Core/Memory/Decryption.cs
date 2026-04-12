@@ -1,4 +1,4 @@
-﻿using CTFAK.Utils;
+using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +16,6 @@ namespace CTFAK.Memory
         public static byte[] KeyString(string str)
         {
             // thank you LAK
-            // fuck you openai
             // this code is quite stupid, but i will not touch it for now
             var result = new List<byte>();
             result.Capacity = str.Length * 2;
@@ -119,12 +118,12 @@ namespace CTFAK.Memory
                 if (hash == magic_key[key])
                 {
                     /*if (never_reset_key && !(accum == *(key + 1)))
-                    {
-                        // Ignoring this, because it's not being triggered by the same input data in c++
+{
+	// Ignoring this, because it's not being triggered by the same input data in c++
 
-                        //Console.WriteLine("Failed To Generate Decode Table");
-                        //return false;
-                    }*/
+	//Console.WriteLine("Failed To Generate Decode Table");
+	//return false;
+}*/
 
                     hash = rotate((byte)magic_char);
                     key = 0;

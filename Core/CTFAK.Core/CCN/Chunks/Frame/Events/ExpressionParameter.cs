@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using CTFAK.Memory;
@@ -7,7 +7,7 @@ using CTFAK.Utils;
 
 namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
 {
-    public class ExpressionParameter:ParameterCommon
+    public class ExpressionParameter : ParameterCommon
     {
         public List<Expression> Items = new List<Expression>();
         public short Comparsion;
@@ -21,7 +21,7 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
             {
                 var expression = new Expression();
                 expression.Read(reader);
-                if (expression.ObjectType == 0&& expression.Num==0) break;
+                if (expression.ObjectType == 0 && expression.Num == 0) break;
                 else Items.Add(expression);
             }
         }
@@ -36,22 +36,13 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
                 case 3: return "<";
                 case 4: return ">=";
                 case 5: return ">";
-                    default: return "err";
+                default: return "err";
             }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt16(Comparsion);
-            foreach (Expression item in Items)
-                item.Write(Writer);
-            Writer.WriteInt32(0);
         }
 
         public override string ToString()
         {
-
-            return  $"{(Items.Count > 0 ? "=="+Items[0].ToString() : " ")}";;
+            return $"{(Items.Count > 0 ? "==" + Items[0].ToString() : " ")}"; ;
         }
     }
 }

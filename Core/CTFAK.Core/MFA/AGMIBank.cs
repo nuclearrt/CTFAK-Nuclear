@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Core.CCN.Chunks.Banks.ImageBank;
 using CTFAK.Memory;
 using System.Collections.Generic;
@@ -44,31 +44,6 @@ namespace CTFAK.MMFParser.MFA.Loaders
 
             foreach (var task in ImageBank.imageReadingTasks) task.Wait();
             ImageBank.imageReadingTasks.Clear();
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt32(_graphicMode);
-            writer.WriteInt16((short)_paletteVersion);
-            writer.WriteInt16((short)_paletteEntries);
-            for (var i = 0; i < 256; i++) writer.WriteColor(Palette[i]);
-
-            writer.WriteInt32(Items.Count);
-            foreach (var key in Items.Keys)
-            {
-                var newWriter = new ByteWriter(new MemoryStream());
-                var writeTask = new Task(() =>
-                {
-                    var newOffset = Items[key].WriteNew(newWriter);
-                });
-                _imageWriteTasks.Add(writeTask);
-                _imageWriters.Add(newWriter);
-                writeTask.Start();
-            }
-
-            foreach (var task in _imageWriteTasks) task.Wait();
-
-            foreach (var newWriter in _imageWriters) writer.WriteWriter(newWriter);
         }
     }
 }

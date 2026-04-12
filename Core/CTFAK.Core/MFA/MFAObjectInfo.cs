@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using CTFAK.MFA.MFAObjectLoaders;
 using CTFAK.Utils;
@@ -27,32 +27,8 @@ namespace CTFAK.MFA
         public ChunkLoader Loader;
         public MFAObjectFlags FlagWriter;
 
-        public override void Write(ByteWriter Writer)
-        {
-            //Debug.Assert(ObjectType==2);
-            Writer.WriteInt32(this.ObjectType);
-            Writer.WriteInt32(Handle);
-            Writer.AutoWriteUnicode(Name);
-            Writer.WriteInt32(Transparent);
-            Writer.WriteInt32(InkEffect);
-            Writer.WriteUInt32(InkEffectParameter);
-            Writer.WriteInt32(AntiAliasing);
-            Writer.WriteInt32(Flags);
-            Writer.WriteInt32(1);
-            Writer.WriteInt32(IconHandle);
-
-            if (FlagWriter != null)
-                FlagWriter.Write(Writer);
-
-            Chunks.Write(Writer);
-            Loader.Write(Writer);
-        }
-
-
-
         public override void Read(ByteReader reader)
         {
-
             ObjectType = reader.ReadInt32();
             Handle = reader.ReadInt32();
             Name = reader.AutoReadUnicode();
@@ -65,11 +41,8 @@ namespace CTFAK.MFA
             Flags = reader.ReadInt32();
 
             IconType = reader.ReadInt32();
-            if (IconType == 1)
-            {
-                IconHandle = reader.ReadInt32();
-            }
-            else throw new InvalidDataException("invalid icon");
+            IconHandle = reader.ReadInt32();
+
             Chunks = new MFAChunks();
             Chunks.Log = true;
             Chunks.Read(reader);
@@ -90,19 +63,24 @@ namespace CTFAK.MFA
             {
                 Loader = new MFAActive();
             }
-            else if(ObjectType == 3)
+            else if (ObjectType == 3)
             {
                 Loader = new MFAText();
+            }
+            else if (ObjectType == 5 || ObjectType == 6)
+            {
+                Loader = new MFALivesScore();
             }
             else if (ObjectType == 7)
             {
                 Loader = new MFACounter();
             }
+            else if (ObjectType == 8)
+            {
+                Loader = new MFAFormattedText();
+            }
             else throw new NotImplementedException("Unsupported object: " + ObjectType);
             Loader.Read(reader);
-
-
-
         }
 
     }

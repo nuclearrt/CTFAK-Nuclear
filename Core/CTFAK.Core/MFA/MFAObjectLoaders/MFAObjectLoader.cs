@@ -1,5 +1,6 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
+using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,34 +20,8 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public MFAValueList Strings;
         public MFAMovements Movements;
         public Behaviours Behaviours;
-
-        public override void Write(ByteWriter Writer)
-        {
-            // if(Qualifiers==null) throw new NullReferenceException("QUALIFIERS NULL");
-            //AltFlags.Write(Writer);
-            Writer.WriteInt32((int)ObjectFlags);
-            Writer.WriteInt32(NewObjectFlags);
-            // var col = Color.FromArgb(255,BackgroundColor.R,BackgroundColor.G,BackgroundColor.B);
-            Writer.WriteColor(BackgroundColor);
-
-
-            for (int i = 0; i < 8; i++)
-            {
-                Writer.WriteInt16(Qualifiers[i]);
-            }
-            Writer.WriteInt16(-1);
-            Values.Write(Writer);
-            Strings.Write(Writer);
-            Movements.Write(Writer);
-            Behaviours.Write(Writer);
-
-            Writer.WriteInt8(0);//FadeIn
-            Writer.WriteInt8(0);//FadeOut
-
-
-        }
-
-
+        public MFATransition FadeIn;
+        public MFATransition FadeOut;
 
         public override void Read(ByteReader reader)
         {
@@ -62,6 +37,7 @@ namespace CTFAK.MFA.MFAObjectLoaders
                 // break;
                 // }
                 Qualifiers[i] = value;
+
             }
             reader.Seek(end);
 
@@ -73,11 +49,17 @@ namespace CTFAK.MFA.MFAObjectLoaders
             Movements.Read(reader);
             Behaviours = new Behaviours();
             Behaviours.Read(reader);
-            reader.Skip(2);//Transitions
-                           // Print();
+            if (reader.ReadByte() == 1)
+            {
+                FadeIn = new MFATransition();
+                FadeIn.Read(reader);
+            }
 
-
-
+            if (reader.ReadByte() == 1)
+            {
+                FadeOut = new MFATransition();
+                FadeOut.Read(reader);
+            }
         }
     }
 }

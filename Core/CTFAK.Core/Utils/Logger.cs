@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -8,11 +8,18 @@ namespace CTFAK.Utils
     {
         public delegate void EventLogger(string log, ConsoleColor color);
         public static event EventLogger OnLogged;
+
+        private static Action<string>? UILogAction = null;
+        public static void SetUILogAction(Action<string>? logAction)
+        {
+            UILogAction = logAction;
+        }
+
         static StreamWriter _writer;
         static Logger()
         {
             File.Delete("Latest.log");
-            _writer = new StreamWriter("Latest.log", false);
+            _writer = new StreamWriter("Latest.log", false, System.Text.Encoding.UTF8);
             _writer.AutoFlush = true;
         }
 
@@ -28,23 +35,12 @@ namespace CTFAK.Utils
         }
         public static void Log(string text, bool logToScreen = true, ConsoleColor color = ConsoleColor.White)
         {
-            var actualText = $"[{DateTime.Now.ToString("HH:mm:ss:ff")}] {text}";
-            if (logToScreen)
+            if (UILogAction != null)
             {
-                Console.ForegroundColor = color;
-                Console.WriteLine(actualText);
-                Console.ForegroundColor = ConsoleColor.White;
-                OnLogged?.Invoke(actualText, color);
+                UILogAction(text);
             }
 
-
-            _writer.WriteLine(actualText);
-            _writer.Flush();
-
-            //if (logToConsole) MainConsole.Message(text);
-
-
-
+            _writer.WriteLine(text);
         }
     }
 }

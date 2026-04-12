@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
@@ -32,20 +32,5 @@ namespace CTFAK.MFA
             ItemHandle = reader.ReadUInt32();
             ParentHandle = (uint)reader.ReadInt32();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(X);
-            Writer.WriteInt32(Y);
-            Writer.WriteUInt32(Layer);
-            Writer.WriteInt32(Handle);
-            Writer.WriteInt16(Flags);
-            Writer.WriteInt16(Instance);
-            Writer.WriteUInt32(ParentType);
-            Writer.WriteUInt32(ItemHandle);
-            Writer.WriteInt32((int)ParentHandle);
-        }
-
-
     }
 }

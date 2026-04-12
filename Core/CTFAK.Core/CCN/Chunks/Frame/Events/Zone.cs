@@ -1,16 +1,14 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 
 namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
 {
-    public class Zone:ParameterCommon
+    public class Zone : ParameterCommon
     {
         public short X1;
         public short Y1;
         public short X2;
         public short Y2;
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -18,14 +16,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
             Y1 = reader.ReadInt16();
             X2 = reader.ReadInt16();
             Y2 = reader.ReadInt16();
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt16(X1);
-            Writer.WriteInt16(Y1);
-            Writer.WriteInt16(X2);
-            Writer.WriteInt16(Y2);
         }
 
         public override string ToString()

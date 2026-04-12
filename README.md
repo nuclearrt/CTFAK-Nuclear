@@ -1,3 +1,8 @@
+# CTFAK Nuclear
+This is a fork of CTFAK 2.0 used for [NuclearRT](https://github.com/nuclearrt/nuclearrt). This older Clickteam Fusion decompiler is used instead of newer ones due to its license.
+
+# Original README
+
 > [!CAUTION]
 > CTFAK 2.0 is no longer being worked on and thus has been archived.
 

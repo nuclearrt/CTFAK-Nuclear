@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +17,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public int Width;
         public int Height;
 
-
-
         public override void Read(ByteReader reader)
         {
             base.Read(reader);
@@ -35,28 +33,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
             Font = reader.ReadInt32();
             Width = reader.ReadInt32();
             Height = reader.ReadInt32();
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            base.Write(Writer);
-            Writer.WriteInt32((int)Player);
-            if (!CTFAKCore.parameters.Contains("-noimgs"))
-            {
-                Writer.WriteInt32(Images.Count);
-                foreach (int i in Images)
-                {
-                    Writer.WriteInt32(i);
-                }
-            }
-            else
-                Writer.WriteInt32(0);
-            Writer.WriteInt32(DisplayType);
-            Writer.WriteInt32(Flags);
-            Writer.WriteInt32(Font);
-            Writer.WriteInt32(Width);
-            Writer.WriteInt32(Height);
-
         }
     }
 }

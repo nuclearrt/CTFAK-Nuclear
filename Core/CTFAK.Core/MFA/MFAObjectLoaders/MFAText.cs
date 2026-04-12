@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
@@ -36,24 +36,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
                 Items.Add(par);
             }
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            base.Write(Writer);
-            Writer.WriteUInt32(Width);
-            Writer.WriteUInt32(Height);
-            Writer.WriteUInt32(Font);
-            Writer.WriteColor(Color);
-            Writer.WriteUInt32(Flags);
-            Writer.WriteInt32(0);
-            Writer.WriteUInt32((uint)Items.Count);
-            foreach (MFAParagraph paragraph in Items)
-            {
-                paragraph.Write(Writer);
-            }
-
-
-        }
     }
 
     public class MFAParagraph : ChunkLoader
@@ -61,22 +43,10 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public string Value;
         public uint Flags;
 
-
-
-
-
         public override void Read(ByteReader reader)
         {
             Value = reader.AutoReadUnicode();
             Flags = reader.ReadUInt32();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.AutoWriteUnicode(Value);
-            Writer.WriteUInt32(Flags);
-        }
-
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +6,6 @@ using CTFAK.Memory;
 using CTFAK.MMFParser.EXE.Loaders.Events.Expressions;
 using CTFAK.MMFParser.EXE.Loaders.Events.Parameters;
 using CTFAK.Utils;
-using Microsoft.AspNetCore.Http.Features;
 
 namespace CTFAK.CCN.Chunks.Frame
 {
@@ -27,15 +26,6 @@ namespace CTFAK.CCN.Chunks.Frame
         public List<EventGroup> Items = new List<EventGroup>();
 
         public static int IdentifierCounter;
-
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -64,25 +54,14 @@ namespace CTFAK.CCN.Chunks.Frame
                 }
                 else if (identifier == EventCount)
                 {
-                    if (Settings.Android) reader.Skip(4); // Does nothing.
                     var size = reader.ReadInt32();
                 }
                 else if (identifier == EventgroupData)
                 {
+                    // We skip ccn events since MFA events are used instead. - shishkabob
                     var size = reader.ReadInt32();
-                    if (Settings.Android) size += 4;
-                    
                     var endPosition = reader.Tell() + size;
-                    if (Settings.Android) reader.ReadInt32();
-                    while (true)
-                    {
-                        var eg = new EventGroup();
-                        eg.Read(reader);
-                        Items.Add(eg);
-
-                        if (reader.Tell() >= endPosition) break;
-                    }
-
+                    reader.Seek(endPosition);
                 }
                 else if (identifier == EventOptions)
                 {
@@ -107,14 +86,7 @@ namespace CTFAK.CCN.Chunks.Frame
             Type = reader.ReadInt16();
             Qualifier = ObjectInfo & 0b11111111111;
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt16((ushort)ObjectInfo);
-            Writer.WriteInt16((short)Type);
-        }
     }
-
 
     public class EventGroup : ChunkLoader
     {
@@ -130,6 +102,8 @@ namespace CTFAK.CCN.Chunks.Frame
         public byte NumberOfActions;
         public bool isMFA = false;
 
+        public bool IsGlobal { get; set; } = false;
+
         public override void Read(ByteReader reader)
         {
             var currentPosition = reader.Tell();
@@ -137,41 +111,12 @@ namespace CTFAK.CCN.Chunks.Frame
             NumberOfConditions = reader.ReadByte();
             NumberOfActions = reader.ReadByte();
             Flags = reader.ReadUInt16();
-            if (Settings.Old)
-            {
-                IsRestricted = reader.ReadInt16(); //For MFA
-                RestrictCpt = reader.ReadInt16();
-                Identifier = reader.ReadInt16();
-                Undo = reader.ReadInt16();
-            }
-            else
-            {
-                if (Settings.Build >= 284)
-                {
-                    if (isMFA || Settings.Android && Settings.Build == 287)
-                    {
-                        IsRestricted = reader.ReadInt16(); //For MFA
-                        RestrictCpt = reader.ReadInt16();
-                        Identifier = reader.ReadInt16();
-                        Undo = reader.ReadInt16();
-                    }
-                    else
-                    {
-                        var Line = reader.ReadInt16();
-                        IsRestricted = reader.ReadInt32();
-                        RestrictCpt = reader.ReadInt32();
-                    }
-                }
-                else
-                {
-                    IsRestricted = reader.ReadInt16();
-                    RestrictCpt = reader.ReadInt16();
-                    Identifier = reader.ReadInt16();
-                    Undo = reader.ReadInt16();
-                }
-            }
 
-            // Logger.Log($"Cond: {NumberOfConditions},Act: {NumberOfActions}");
+            IsRestricted = reader.ReadInt16(); //For MFA
+            RestrictCpt = reader.ReadInt16();
+            Identifier = reader.ReadInt16();
+            Undo = reader.ReadInt16();
+
             for (int i = 0; i < NumberOfConditions; i++)
             {
                 var item = new Condition();
@@ -179,9 +124,9 @@ namespace CTFAK.CCN.Chunks.Frame
                 item.Identifier += Events.IdentifierCounter;
                 Fixer.FixConditions(ref item);
                 if (item.Num == -27 && item.ObjectType == -1 ||
-                    item.Num == -43 && item.ObjectType == -1)
+                        item.Num == -43 && item.ObjectType == -1)
                 {
-                    //this is the most retarded thing i have ever seen and it breaks mfa reading. fuck that one moron who added that
+                    //breaks mfa reading
                 }
                 else if (item.Num == -25 || item.Num == -41)
                 {
@@ -192,15 +137,6 @@ namespace CTFAK.CCN.Chunks.Frame
                         {
                             if (param.Loader is MultipleVariables multivar)
                             {
-                                //To the no-lifer who decided that it was a good idea to do that kind of shit:
-                                //All that bit logic bullshit is probably slower than the normal way of value comparsion
-                                //And if it was done to prevent decompilers from working with it - you have failed
-                                //I mean, I do respect people who actually develop Fusion (Yves and Francois), but whoever decided to do this thing is a fucking retard
-
-                                //2.01.2023 I should probably rewrite this part, because fixing and translating it there is kind of dumb if you ask me
-                                //11.03.2023 Yuni forced me to fix instance, so I'm back here again. I hate this fucking condition and I don't want to ever revisit it again anytime soon
-                                //12.03.2023 Turns out my fix didn't really work, so I'm back here again
-
                                 int cnt = 0;
                                 int mask = 1;
                                 while (true)
@@ -274,7 +210,7 @@ namespace CTFAK.CCN.Chunks.Frame
                 var item = new Action();
                 item.Read(reader);
                 Fixer.FixActions(ref item);
-                if (item.Num == 43 && item.ObjectType == -1) {} 
+                if (item.Num == 43 && item.ObjectType == -1) { }
                 else if (item.Num == 2 && item.Items.Count == 2)
                 {
                     var xAct = new Action();
@@ -298,54 +234,8 @@ namespace CTFAK.CCN.Chunks.Frame
                 }
                 else Actions.Add(item);
             }
+
             reader.Seek(currentPosition + (Size * -1));
-            // Logger.Log($"COND:{NumberOfConditions}, ACT: {NumberOfActions}");
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            ByteWriter newWriter = new ByteWriter(new MemoryStream());
-            newWriter.WriteInt8((byte)Conditions.Count);
-            newWriter.WriteInt8((byte)Actions.Count);
-            newWriter.WriteUInt16(Flags);
-            if (Settings.Build >= 284)
-            {
-                if (isMFA)//For MFA
-                {
-                    newWriter.WriteInt16((short)IsRestricted);
-                    newWriter.WriteInt16((short)RestrictCpt);
-                    newWriter.WriteInt16((short)Identifier);
-                    newWriter.WriteInt16((short)Undo);
-                }
-                else
-                {
-                    newWriter.WriteInt16(0);
-                    newWriter.WriteInt32(IsRestricted);
-                    newWriter.WriteInt32(RestrictCpt);
-                }
-            }
-            else
-            {
-                newWriter.WriteInt16((short)IsRestricted);
-                newWriter.WriteInt16((short)RestrictCpt);
-                newWriter.WriteInt16((short)Identifier);
-                newWriter.WriteInt16((short)Undo);
-            }
-
-            foreach (Condition condition in Conditions)
-            {
-                var cond = condition;
-                condition.Write(newWriter);
-            }
-
-            foreach (Action action in Actions)
-            {
-                var act = action;
-                act.Write(newWriter);
-            }
-            Writer.WriteInt16((short)((newWriter.Size() + 2) * -1));
-
-            Writer.WriteWriter(newWriter);
         }
     }
 
@@ -358,15 +248,15 @@ namespace CTFAK.CCN.Chunks.Frame
             if ((num == -42 || num == -43) && cond.ObjectType != -1) num = -27;
             //Global Values
             if (cond.ObjectType == -1)
-            if (num == -28 || num == -29 || num == -30 || num == -31 || num == -32 || num == -33)
-                num = -8;
+                if (num == -28 || num == -29 || num == -30 || num == -31 || num == -32 || num == -33)
+                    num = -8;
             cond.Num = num;
         }
         public static void FixActions(ref Action act)
         {
             var num = act.Num;
             var type = act.ObjectType;
-            if(type==-1)
+            if (type == -1)
             {
                 if (num == 27 || num == 28 || num == 29 || num == 30)
                     num = 3;
@@ -378,44 +268,36 @@ namespace CTFAK.CCN.Chunks.Frame
             act.Num = num;
         }
     }
-    public class Condition : ChunkLoader
+
+    public class EventBase : ChunkLoader
     {
         public int Flags;
         public int OtherFlags;
         public int DefType;
-        public int NumberOfParameters;
         public int ObjectType;
         public int Num;
         public int ObjectInfo;
-        public int Identifier;
         public int ObjectInfoList;
+
+        public byte NumberOfParameters;
         public List<Parameter> Items = new List<Parameter>();
 
-        public override void Write(ByteWriter Writer)
+        public override void Read(ByteReader reader)
         {
-            ByteWriter newWriter = new ByteWriter(new MemoryStream());
-            //Logger.Log($"{ObjectType}-{Num}-{ObjectInfo}-{ObjectInfoList}-{Flags}-{OtherFlags}-{Items.Count}-{DefType}-{Identifier}");
-            newWriter.WriteInt16((short)ObjectType);
-            newWriter.WriteInt16((short)Num);
-            newWriter.WriteUInt16((ushort)ObjectInfo);
-            newWriter.WriteInt16((short)ObjectInfoList);
-            newWriter.WriteUInt8((sbyte)Flags);
-            newWriter.WriteUInt8((sbyte)OtherFlags);
-            newWriter.WriteUInt8((sbyte)Items.Count);
-            newWriter.WriteInt8((byte)DefType);
-            newWriter.WriteUInt16((ushort)Identifier);
-            foreach (Parameter parameter in Items)
-                parameter.Write(newWriter);
-            Writer.WriteInt16((short)(newWriter.BaseStream.Position + 2));
-            Writer.WriteWriter(newWriter);
+            throw new NotImplementedException();
         }
+    }
+
+    public class Condition : EventBase
+    {
+        public int Identifier;
 
         public override void Read(ByteReader reader)
         {
             var currentPosition = reader.Tell();
             var size = reader.ReadUInt16();
 
-            ObjectType =reader.ReadInt16(); 
+            ObjectType = reader.ReadInt16();
             Num = reader.ReadInt16();
             ObjectInfo = reader.ReadUInt16();
             ObjectInfoList = reader.ReadInt16();
@@ -434,7 +316,7 @@ namespace CTFAK.CCN.Chunks.Frame
                     Items.Add(item);
                 }
             }
-            
+
             //Logger.Log(this);
             //Console.ReadKey();
         }
@@ -446,36 +328,8 @@ namespace CTFAK.CCN.Chunks.Frame
         }
     }
 
-    public class Action : ChunkLoader
+    public class Action : EventBase
     {
-        public int Flags;
-        public int OtherFlags;
-        public int DefType;
-        public int ObjectType;
-        public int Num;
-        public int ObjectInfo;
-        public int ObjectInfoList;
-        public List<Parameter> Items = new List<Parameter>();
-        public byte NumberOfParameters;
-        public override void Write(ByteWriter Writer)
-        {
-            ByteWriter newWriter = new ByteWriter(new MemoryStream());
-            newWriter.WriteInt16((short)ObjectType);
-            newWriter.WriteInt16((short)Num);
-            newWriter.WriteUInt16((ushort)ObjectInfo);
-            newWriter.WriteInt16((short)ObjectInfoList);
-            newWriter.WriteUInt8((sbyte)Flags);
-            newWriter.WriteUInt8((sbyte)OtherFlags);
-            newWriter.WriteUInt8((sbyte)Items.Count);
-            newWriter.WriteInt8((byte)DefType);
-
-            foreach (Parameter parameter in Items)
-                parameter.Write(newWriter);
-            Writer.WriteUInt16((ushort)(newWriter.BaseStream.Position + 2));
-            Writer.WriteWriter(newWriter);
-            //File.WriteAllBytes("AHAHA.bin", newWriter.GetBuffer());
-        }
-
         public override void Read(ByteReader reader)
         {
             var old = false;
@@ -512,15 +366,6 @@ namespace CTFAK.CCN.Chunks.Frame
     {
         public int Code;
         public ChunkLoader Loader;
-
-        public override void Write(ByteWriter Writer)
-        {
-            var newWriter = new ByteWriter(new MemoryStream());
-            newWriter.WriteInt16((short)Code);
-            Loader.Write(newWriter);
-            Writer.WriteUInt16((ushort)(newWriter.BaseStream.Position + 2));
-            Writer.WriteWriter(newWriter);
-        }
 
         public override void Read(ByteReader reader)
         {
@@ -562,11 +407,11 @@ namespace CTFAK.CCN.Chunks.Frame
             ChunkLoader item = null;
             if (code == 1)
                 item = new ParamObject();
-            if (code == 2||code==42)
+            if (code == 2 || code == 42)
                 item = new Time();
             if (code == 3 || code == 4 || code == 10 || code == 11 || code == 12 || code == 17 ||
-                code == 26 || code == 31 || code == 43 || code == 57 || code == 58 || code == 60 ||
-                code == 61)
+                    code == 26 || code == 31 || code == 37 || code == 43 || code == 57 || code == 58 || code == 60 ||
+                    code == 61)
                 item = new Short();
             if (code == 5 || code == 25 || code == 29 || code == 34 || code == 48 || code == 56)
                 item = new IntParam();
@@ -579,7 +424,7 @@ namespace CTFAK.CCN.Chunks.Frame
             if (code == 14 || code == 44)
                 item = new KeyParameter();
             if (code == 15 || code == 22 || code == 23 || code == 27 || code == 28 || code == 45 ||
-                code == 46 || code == 52 || code == 53 || code == 54 || code == 59 || code == 62)
+                    code == 46 || code == 52 || code == 53 || code == 54 || code == 59 || code == 62)
                 item = new ExpressionParameter();
             if (code == 16)
                 item = new Position();

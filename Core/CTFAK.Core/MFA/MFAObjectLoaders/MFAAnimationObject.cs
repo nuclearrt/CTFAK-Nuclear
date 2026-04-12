@@ -1,5 +1,6 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
+using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace CTFAK.MFA.MFAObjectLoaders
         {
             base.Read(reader);
 
-            if (reader.ReadByte() != 0)
+            if (reader.ReadByte() == 1)
             {
                 var animationCount = reader.ReadUInt32();
                 for (int i = 0; i < animationCount; i++)
@@ -28,46 +29,12 @@ namespace CTFAK.MFA.MFAObjectLoaders
                 }
             }
         }
-
-        public void Write(ByteWriter Writer, bool ext)
-        {
-            _isExt = ext;
-            Write(Writer);
-        }
-        public override void Write(ByteWriter Writer)
-        {
-            base.Write(Writer);
-            if (_isExt)
-            {
-                Writer.WriteInt8(0);
-                Writer.WriteInt32(-1);
-            }
-            else
-            {
-                Writer.WriteInt8(1);
-                Writer.WriteUInt32((uint)Items.Count);
-                foreach (MFAAnimation animation in Items.Values)
-                {
-                    animation.Write(Writer);
-                }
-            }
-        }
     }
 
     public class MFAAnimation : ChunkLoader
     {
         public string Name = "";
         public List<MFAAnimationDirection> Directions;
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.AutoWriteUnicode(Name);
-            Writer.WriteInt32(Directions.Count);
-            foreach (MFAAnimationDirection direction in Directions)
-            {
-                direction.Write(Writer);
-            }
-        }
 
         public override void Read(ByteReader reader)
         {
@@ -91,22 +58,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public int Repeat;
         public int BackTo;
         public List<int> Frames = new List<int>();
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Index);
-            Writer.WriteInt32(MinSpeed);
-            Writer.WriteInt32(MaxSpeed);
-            Writer.WriteInt32(Repeat);
-            Writer.WriteInt32(BackTo);
-            Writer.WriteInt32(Frames.Count);
-            foreach (int frame in Frames)
-            {
-                Writer.WriteInt32(frame);
-            }
-
-        }
-
 
         public override void Read(ByteReader reader)
         {

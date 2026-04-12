@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using CTFAK.CCN.Chunks;
 using CTFAK.Core.Utils;
@@ -7,7 +7,7 @@ using CTFAK.Utils;
 
 namespace CTFAK.MMFParser.EXE.Loaders
 {
-    public class Shaders:ChunkLoader
+    public class Shaders : ChunkLoader
     {
         public Dictionary<int, Shader> ShaderList;
 
@@ -37,15 +37,8 @@ namespace CTFAK.MMFParser.EXE.Loaders
                 }
             }
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
-        }
-
-
     }
-    public class Shader:ChunkLoader
+    public class Shader : ChunkLoader
     {
         public List<ShaderParameter> Parameters = new List<ShaderParameter>();
         public string Name;
@@ -58,16 +51,16 @@ namespace CTFAK.MMFParser.EXE.Loaders
             var dataOffset = reader.ReadInt32();
             var parameterOffset = reader.ReadInt32();
             BackgroundTexture = reader.ReadInt32();
-            reader.Seek(start+nameOffset);
+            reader.Seek(start + nameOffset);
             Name = reader.ReadAscii();
-            reader.Seek(start+dataOffset);
+            reader.Seek(start + dataOffset);
             Data = reader.ReadAscii();
             if (parameterOffset != 0)
             {
-                parameterOffset = (int) (parameterOffset + start);
+                parameterOffset = (int)(parameterOffset + start);
                 reader.Seek(parameterOffset);
                 var paramCount = reader.ReadInt32();
-                
+
                 for (int i = 0; i < paramCount; i++)
                 {
                     var newParameter = new ShaderParameter();
@@ -76,12 +69,12 @@ namespace CTFAK.MMFParser.EXE.Loaders
 
                 var typeOffset = reader.ReadInt32();
                 var namesOffset = reader.ReadInt32();
-                reader.Seek(parameterOffset+typeOffset);
+                reader.Seek(parameterOffset + typeOffset);
                 foreach (var parameter in Parameters)
                 {
                     parameter.Type = reader.ReadByte();
                 }
-                reader.Seek(parameterOffset+namesOffset);
+                reader.Seek(parameterOffset + namesOffset);
                 foreach (ShaderParameter parameter in Parameters)
                 {
                     parameter.Name = reader.ReadAscii();
@@ -89,15 +82,9 @@ namespace CTFAK.MMFParser.EXE.Loaders
             }
             ShaderGenerator.CreateAndDumpShader(this);
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
-        }
-
-
     }
-    public class ShaderParameter:ChunkLoader
+
+    public class ShaderParameter : ChunkLoader
     {
         public string Name;
         public int Type;
@@ -106,12 +93,6 @@ namespace CTFAK.MMFParser.EXE.Loaders
         {
             throw new System.NotImplementedException();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            throw new System.NotImplementedException();
-        }
-
 
         public string GetValueType()
         {

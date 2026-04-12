@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,7 @@ namespace CTFAK.MFA
 {
     public class MFAControls : ChunkLoader
     {
-        public List<MFAPlayerControl> Items=new List<MFAPlayerControl>();
-
+        public List<MFAPlayerControl> Items = new List<MFAPlayerControl>();
 
         public override void Read(ByteReader reader)
         {
@@ -24,17 +23,6 @@ namespace CTFAK.MFA
                 item.Read(reader);
             }
         }
-
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt32(Items.Count);
-            foreach (var item in Items)
-            {
-                item.Write(writer);
-            }
-
-        }
-
     }
 
     public class MFAPlayerControl : ChunkLoader
@@ -57,12 +45,6 @@ namespace CTFAK.MFA
         public int Unk7;
         public int Unk8;
 
-
-
-
-
-       
-
         public override void Read(ByteReader reader)
         {
             ControlType = reader.ReadInt32();
@@ -83,32 +65,6 @@ namespace CTFAK.MFA
             Unk6 = reader.ReadInt32();
             Unk7 = reader.ReadInt32();
             Unk8 = reader.ReadInt32();
-
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt32(ControlType);
-            writer.WriteUInt32(16);
-            writer.WriteInt32(Up);
-            writer.WriteInt32(Down);
-            writer.WriteInt32(Left);
-            writer.WriteInt32(Right);
-            writer.WriteInt32(Button1);
-            writer.WriteInt32(Button2);
-            writer.WriteInt32(Button3);
-            writer.WriteInt32(Button4);
-            writer.WriteInt32(Unk1);
-            writer.WriteInt32(Unk2);
-            writer.WriteInt32(Unk3);
-            writer.WriteInt32(Unk4);
-            writer.WriteInt32(Unk5);
-            writer.WriteInt32(Unk6);
-            writer.WriteInt32(Unk7);
-            writer.WriteInt32(Unk8);
-
-
-
         }
     }
 }

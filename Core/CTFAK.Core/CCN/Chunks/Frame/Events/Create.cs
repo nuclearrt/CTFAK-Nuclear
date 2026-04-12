@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 
 namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
@@ -16,14 +16,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
             ObjectInstances = reader.ReadUInt16();
             ObjectInfo = reader.ReadUInt16();
             // Reader.Skip(4);
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Position.Write(Writer);
-            Writer.WriteUInt16((ushort) ObjectInstances);
-            Writer.WriteUInt16((ushort) ObjectInfo);
-            // Writer.Skip(4);
         }
 
         public override string ToString()

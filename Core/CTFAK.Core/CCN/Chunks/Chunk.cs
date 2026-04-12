@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
@@ -16,9 +16,9 @@ namespace CTFAK.CCN.Chunks
         Encrypted = 2,
         CompressedAndEncrypted = 3
     }
+
     public class Chunk
     {
-
         public short Id;
         public ChunkFlags Flag;
         public int Size;
@@ -42,20 +42,13 @@ namespace CTFAK.CCN.Chunks
                     ChunkData = Decryption.DecodeMode3(dataReader.ReadBytes(Size), Id, out var DecompressedSize);
                     break;
                 case ChunkFlags.Compressed:
-                    if (Settings.Old)
-                    {
-                        var start = dataReader.Tell();
-                        ChunkData = Decompressor.DecompressOld(dataReader);
-                        dataReader.Seek(start + Size);
-                    }
-                    else ChunkData = Decompressor.Decompress(dataReader, out DecompressedSize);
-                    
+                    ChunkData = Decompressor.Decompress(dataReader, out DecompressedSize);
                     break;
                 case ChunkFlags.NotCompressed:
                     ChunkData = dataReader.ReadBytes(Size);
                     break;
             }
-            
+
             if (ChunkData == null)
             {
                 Logger.Log($"Chunk data is null for chunk {ChunkList.ChunkNames[Id]} with flag {Flag}");
@@ -66,39 +59,10 @@ namespace CTFAK.CCN.Chunks
             }
             return ChunkData;
         }
-
-        public void Write(ByteWriter fileWriter, ByteWriter dataWriter)
-        {
-
-            fileWriter.WriteInt16(Id);
-            fileWriter.WriteInt16((short)Flag);
-            ByteWriter newWriter = null;
-            switch (Flag)
-            {
-                case ChunkFlags.NotCompressed:
-                    newWriter = dataWriter;
-                    break;
-                case ChunkFlags.Encrypted:
-                    //newWriter = new ByteWriter(new MemoryStream(Decryption.TransformChunk(dataWriter.ToArray())));
-                    break;
-                case ChunkFlags.Compressed:
-                    newWriter = Decompressor.Compress(dataWriter.ToArray());
-                    break;
-                case ChunkFlags.CompressedAndEncrypted:
-                    // TODO Implement
-                    break;
-
-            }
-            fileWriter.WriteWriter(newWriter);
-
-        }
     }
+
     public abstract class ChunkLoader
     {
-
         public abstract void Read(ByteReader reader);
-
-        public abstract void Write(ByteWriter writer);
-
     }
 }

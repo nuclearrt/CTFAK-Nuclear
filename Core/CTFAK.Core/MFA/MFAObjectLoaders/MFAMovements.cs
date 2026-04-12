@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.CCN.Chunks.Objects;
 using CTFAK.Memory;
 using System;
@@ -13,16 +13,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
     public class MFAMovements : ChunkLoader
     {
         public List<MFAMovement> Items = new List<MFAMovement>();
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteUInt32((uint)Items.Count);
-            foreach (MFAMovement movement in Items)
-            {
-                movement.Write(Writer);
-            }
-        }
-
-
 
         public override void Read(ByteReader reader)
         {
@@ -34,8 +24,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
                 Items.Add(item);
 
             }
-
-
         }
     }
 
@@ -51,33 +39,6 @@ namespace CTFAK.MFA.MFAObjectLoaders
         public int DataSize;
         public byte[] extData = new byte[14];
         public MovementLoader Loader;
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.AutoWriteUnicode(Name); // | Movement #0
-            Writer.AutoWriteUnicode(Extension); // |
-            Writer.WriteUInt32(Identifier); // 5 | 5
-            var newWriter = new ByteWriter(new MemoryStream());
-
-            newWriter.WriteUInt16(Player); // 0 | 0
-            newWriter.WriteUInt16(Type); // 5 | 5
-            newWriter.WriteInt8(MovingAtStart); // 1 | 1
-            newWriter.Skip(3);
-            newWriter.WriteInt32(DirectionAtStart); // 1 | 1
-
-            // newWriter.WriteBytes(extData);
-
-
-            Loader?.Write(newWriter);
-            newWriter.Skip(12);
-            newWriter.WriteInt16(0);
-            Writer.WriteInt32((int)newWriter.Size()); // 684 | 86
-            Writer.WriteWriter(newWriter);
-
-
-        }
-
-
 
         public override void Read(ByteReader reader)
         {

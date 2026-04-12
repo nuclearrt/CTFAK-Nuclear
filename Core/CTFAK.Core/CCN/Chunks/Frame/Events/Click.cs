@@ -1,9 +1,9 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 
 namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
 {
-    public class Click:ParameterCommon
+    public class Click : ParameterCommon
     {
         public byte IsDouble;
         public byte Button;
@@ -14,13 +14,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
         {
             Button = reader.ReadByte();
             IsDouble = reader.ReadByte();
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt8(Button);
-            Writer.WriteInt8(IsDouble);
-            
         }
 
         public override string ToString()

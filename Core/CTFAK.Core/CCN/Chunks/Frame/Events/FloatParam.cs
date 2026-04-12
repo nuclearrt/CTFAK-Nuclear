@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 
 namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
@@ -10,7 +10,7 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
         public override void Read(ByteReader reader)
         {
             Value = reader.ReadSingle();
-           
+
         }
         public override string ToString()
         {

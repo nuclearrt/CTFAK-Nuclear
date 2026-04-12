@@ -1,4 +1,4 @@
-﻿using CTFAK.Utils;
+using CTFAK.Utils;
 using System;
 using System.Drawing;
 using System.IO;
@@ -74,10 +74,10 @@ namespace CTFAK.Memory
         public void WriteString(string value) => Write(value);
 
         /*public void WriteUniversal(string value, bool addZero = false)
-        {
-            if (Settings.Unicode) WriteUnicode(value, addZero);
-            else WriteAscii(value);
-        }*/
+{
+	if (Settings.Unicode) WriteUnicode(value, addZero);
+	else WriteAscii(value);
+}*/
 
 
         public void WriteAscii(string value)

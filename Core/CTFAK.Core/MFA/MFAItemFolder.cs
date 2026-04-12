@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using System;
 using System.Collections.Generic;
@@ -10,17 +10,17 @@ namespace CTFAK.MFA
 {
     public class MFAItemFolder : ChunkLoader
     {
-        public List<uint> Items=new List<uint>();
+        public List<uint> Items = new List<uint>();
         public string Name;
         public uint UnkHeader;
-        public bool isRetard;
+        public bool isSimple;
 
         public override void Read(ByteReader reader)
         {
             UnkHeader = reader.ReadUInt32();
             if (UnkHeader == 0x70000004)
             {
-                isRetard = false;
+                isSimple = false;
                 Name = reader.AutoReadUnicode();
                 Items = new List<uint>();
                 var count = reader.ReadUInt32();
@@ -31,32 +31,11 @@ namespace CTFAK.MFA
             }
             else
             {
-                isRetard = true;
+                isSimple = true;
                 Name = null;
                 Items = new List<uint>();
                 Items.Add(reader.ReadUInt32());
             }
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            if (isRetard)
-            {
-                Writer.WriteInt32(0x70000005);
-                Writer.WriteInt32((int)Items[0]);
-            }
-            else
-            {
-                Writer.WriteInt32(0x70000004);
-                if (Name == null) Name = "";
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(Items.Count);
-                foreach (var item in Items)
-                {
-                    Writer.WriteUInt32(item);
-                }
-            }
-        }
-
     }
 }

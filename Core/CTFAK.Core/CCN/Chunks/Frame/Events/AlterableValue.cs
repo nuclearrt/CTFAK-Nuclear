@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CTFAK.Memory;
 using CTFAK.Utils;
 

@@ -1,4 +1,4 @@
-﻿using CTFAK.CCN.Chunks;
+using CTFAK.CCN.Chunks;
 using CTFAK.CCN.Chunks.Frame;
 using CTFAK.Memory;
 using CTFAK.MMFParser.EXE.Loaders;
@@ -30,7 +30,7 @@ namespace CTFAK.MFA
                 }
             }
             var newChunk = new MFAChunk(null);
-            if (typeof(T)==typeof(FrameVirtualRect)) newChunk.Id = 33;
+            if (typeof(T) == typeof(FrameVirtualRect)) newChunk.Id = 33;
             else if (typeof(T) == typeof(LayerShaderSettings)) newChunk.Id = 37;
             else if (typeof(T) == typeof(FrameMovementTimer)) newChunk.Id = 39;
             else if (typeof(T) == typeof(FrameShaderSettings)) newChunk.Id = 40;
@@ -63,13 +63,6 @@ namespace CTFAK.MFA
             newChunk.Loader = new T();
             Items.Add(newChunk);
             return (T)newChunk.Loader;
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            foreach (MFAChunk chunk in Items)
-                chunk.Write(Writer);
-            Writer.WriteInt8(0);
         }
 
         public override void Read(ByteReader reader)
@@ -111,7 +104,7 @@ namespace CTFAK.MFA
             if (MFAChunkList.ChunkNames.TryGetValue(Id, out string chunkName))
                 Logger.Log($"Reading MFA Chunk {Id} ({chunkName})");
             //else
-                //Logger.Log($"Reading MFA Chunk {Id}");
+            //Logger.Log($"Reading MFA Chunk {Id}");
             var dataReader = new ByteReader(Data);
             switch (Id)
             {
@@ -139,24 +132,6 @@ namespace CTFAK.MFA
 
             }
             Loader?.Read(dataReader);
-        }
-
-        public void Write(ByteWriter writer)
-        {
-            writer.WriteInt8(Id);
-            if (Id == 0) return;
-            if (Loader == null)
-            {
-                writer.WriteInt32(Data.Length);
-                writer.WriteBytes(Data);
-            }
-            else
-            {
-                var newWriter = new ByteWriter(new MemoryStream());
-                Loader.Write(newWriter);
-                writer.WriteInt32((int)newWriter.Size());
-                writer.WriteWriter(newWriter);
-            }
         }
     }
 
@@ -192,27 +167,6 @@ namespace CTFAK.MFA
                         break;
                 }
             }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(ValueType);
-                switch (ValueType)
-                {
-                    case 0:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                    case 1:
-                        Writer.WriteSingle((float)Value);
-                        break;
-                    case 2:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                    case 3:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                }
-            }
         }
 
         public class MFAShader : MFAChunkLoader
@@ -229,16 +183,6 @@ namespace CTFAK.MFA
                     param.Read(reader);
                     Parameters.Add(param);
 
-                }
-            }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(Parameters.Count);
-                foreach (var param in Parameters)
-                {
-                    param.Write(Writer);
                 }
             }
         }
@@ -263,22 +207,6 @@ namespace CTFAK.MFA
                 var newParam = new MFAShader();
                 newParam.Read(reader);
                 Shaders.Add(newParam);
-            }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            if (HeaderID == 2) Writer.WriteInt32(InkEffect);
-            Writer.WriteInt8(RGBCoeff.B);
-            Writer.WriteInt8(RGBCoeff.G);
-            Writer.WriteInt8(RGBCoeff.R);
-            Writer.WriteInt8(Blend);
-            if (HeaderID == 1) Writer.WriteInt32(9253);
-            else
-            {
-                Writer.WriteInt32(Shaders.Count);
-                foreach (var shdr in Shaders)
-                    shdr.Write(Writer);
             }
         }
     }
@@ -315,27 +243,6 @@ namespace CTFAK.MFA
                         break;
                 }
             }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(ValueType);
-                switch (ValueType)
-                {
-                    case 0:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                    case 1:
-                        Writer.WriteSingle((float)Value);
-                        break;
-                    case 2:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                    case 3:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                }
-            }
         }
 
         public class MFAShader : MFAChunkLoader
@@ -353,14 +260,6 @@ namespace CTFAK.MFA
                     Parameters.Add(param);
 
                 }
-            }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(Parameters.Count);
-                foreach (var param in Parameters)
-                    param.Write(Writer);
             }
         }
 
@@ -385,15 +284,6 @@ namespace CTFAK.MFA
                 newParam.Read(reader);
                 Shaders.Add(newParam);
             }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Effect);
-            Writer.WriteColor(RGBCoeff);
-            Writer.WriteInt32(Shaders.Count);
-            foreach (var shdr in Shaders)
-                shdr.Write(Writer);
         }
     }
 
@@ -429,27 +319,6 @@ namespace CTFAK.MFA
                         break;
                 }
             }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(ValueType);
-                switch (ValueType)
-                {
-                    case 0:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                    case 1:
-                        Writer.WriteSingle((float)Value);
-                        break;
-                    case 2:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                    case 3:
-                        Writer.WriteInt32((int)Value);
-                        break;
-                }
-            }
         }
 
         public class MFAShader : MFAChunkLoader
@@ -466,16 +335,6 @@ namespace CTFAK.MFA
                     param.Read(reader);
                     Parameters.Add(param);
 
-                }
-            }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.AutoWriteUnicode(Name);
-                Writer.WriteInt32(Parameters.Count);
-                foreach (var param in Parameters)
-                {
-                    param.Write(Writer);
                 }
             }
         }
@@ -498,15 +357,6 @@ namespace CTFAK.MFA
                     Shaders.Add(newParam);
                 }
             }
-
-            public override void Write(ByteWriter Writer)
-            {
-                Writer.WriteInt32(InkInMyBum);
-                Writer.WriteColor(RGBCoeff);
-                Writer.WriteInt32(Shaders.Count);
-                foreach (var shdr in Shaders)
-                    shdr.Write(Writer);
-            }
         }
 
         public List<MFALayerShader> LayerShaders = new();
@@ -519,12 +369,6 @@ namespace CTFAK.MFA
                 layer.Read(reader);
                 LayerShaders.Add(layer);
             }
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            foreach (MFALayerShader layer in LayerShaders)
-                layer.Write(Writer);
         }
     }
 
@@ -543,14 +387,6 @@ namespace CTFAK.MFA
             Bottom = reader.ReadInt32();
 
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Left);
-            Writer.WriteInt32(Top);
-            Writer.WriteInt32(Right);
-            Writer.WriteInt32(Bottom);
-        }
     }
 
     public class FrameMovementTimer : MFAChunkLoader
@@ -561,16 +397,10 @@ namespace CTFAK.MFA
         {
             Timer = reader.ReadInt32();
         }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(Timer);
-        }
     }
 
     public abstract class MFAChunkLoader
     {
         public abstract void Read(ByteReader reader);
-        public abstract void Write(ByteWriter Writer);
     }
 }

@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,19 +10,16 @@ namespace CTFAK.CCN.Chunks
 {
     public class StringChunk : ChunkLoader
     {
-        public string value="";
+        public string value = "";
+
         public override void Read(ByteReader reader)
         {
             value = reader.ReadYuniversal();
             if (value == null) value = "";
         }
-
-        public override void Write(ByteWriter writer)
-        {
-            throw new NotImplementedException();
-        }
     }
-    class AppName:StringChunk
+
+    class AppName : StringChunk
     {
         public override void Read(ByteReader reader)
         {
@@ -41,6 +38,7 @@ namespace CTFAK.CCN.Chunks
             }
         }
     }
+
     public class AppAuthor : StringChunk
     {
     }

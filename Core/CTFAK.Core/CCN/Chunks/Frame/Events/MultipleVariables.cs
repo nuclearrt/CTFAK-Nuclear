@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using CTFAK.CCN.Chunks;
 using CTFAK.Memory;
 using CTFAK.Utils;
@@ -13,8 +13,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
         public int index;
         public int op;
 
-
-
         public override void Read(ByteReader reader)
         {
             index = reader.ReadInt32();
@@ -28,25 +26,9 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
                 value = reader.ReadInt32();
                 reader.Skip(4);
             }
-                    
-
-        }
-
-        public override void Write(ByteWriter writer)
-        {
-            writer.WriteInt32(index);
-            writer.WriteInt32(op);
-            if(isDouble)
-            {
-                writer.WriteDouble(value);
-            }
-            else
-            {
-                writer.WriteInt32((int)value);
-                writer.WriteInt32(0);
-            }
         }
     }
+
     class MultipleVariables : ParameterCommon
     {
         public int flags;
@@ -81,17 +63,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
                 values[i] = value;
             }
 
-        }
-
-        public override void Write(ByteWriter Writer)
-        {
-            Writer.WriteInt32(flags);
-            Writer.WriteInt32(flagMasks);
-            Writer.WriteInt32(flagValues);
-            foreach (var item in values)
-            {
-                item.Write(Writer);
-            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using CTFAK.Memory;
+using CTFAK.Memory;
 using CTFAK.Utils;
 using K4os.Compression.LZ4;
 using System;
@@ -12,7 +12,7 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
     {
         public override void Read(ByteReader reader)
         {
-            if (Settings.Fusion3Seed || CTFAKCore.parameters.Contains("-fuckimgs"))
+            if (Settings.Fusion3Seed)
             {
                 var seek = reader.Tell();
                 bool a1 = false;
@@ -54,8 +54,6 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
             ActionY = reader.ReadInt16();
             Transparent = reader.ReadColor();
             //Logger.Log("Image Handle '" + Handle + "'s Transparent color: [" + Transparent + "]");
-            if (Settings.F3)
-                Transparent = Color.Black;
             var decompSizePlus = reader.ReadInt32();
             var rawImg = reader.ReadBytes(Math.Max(0, dataSize - 4));
             var task = new Task(() =>
