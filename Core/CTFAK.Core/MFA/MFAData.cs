@@ -268,7 +268,7 @@ namespace CTFAK.MFA
             CustomQuals = new List<Tuple<string, int>>();
             for (int i = 0; i < QualCount; i++) //qualifiers
             {
-                var name = reader.ReadAscii(reader.ReadInt32());
+                var name = reader.AutoReadUnicode();
                 var handle = reader.ReadInt32();
                 CustomQuals.Add(new Tuple<string, int>(name, handle));
             }
