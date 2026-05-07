@@ -195,7 +195,7 @@ case 13120: // Additional Items Instances
                         {
                             layers.Items[i].Effect = chunkReader.ReadInt16();
                             layers.Items[i].EffectParam = chunkReader.ReadInt16();
-                            layers.Items[i].RGBCoeff = chunkReader.ReadColor();
+                            layers.Items[i].RGBCoeff = chunkReader.ReadABGR();
                             layers.Items[i].InkEffect = chunkReader.ReadInt32();
                             var numberOfParams = chunkReader.ReadInt32();
                             var offset = chunkReader.ReadInt32();
@@ -213,35 +213,15 @@ case 13120: // Additional Items Instances
                             layers.Items[i].shaderData.hasShader = true;
                             var returnOffset = chunkReader.Tell();
                             chunkReader.Seek(offset);
-                            var shdr = CTFAKCore.currentReader.getGameData().shaders.ShaderList[layers.Items[i].InkEffect];
-                            if (CTFAKCore.parameters.Contains("-chunk_info"))
-                                Logger.Log("Shader Name: " + shdr.Name);
-                            layers.Items[i].shaderData.name = shdr.Name;
                             layers.Items[i].shaderData.ShaderHandle = layers.Items[i].InkEffect;
 
                             for (int ii = 0; ii < numberOfParams; ii++)
                             {
-                                var param = shdr.Parameters[ii];
-                                object paramValue;
-                                switch (param.Type)
-                                {
-                                    case 0:
-                                    case 2:
-                                    case 3: //Image Handle
-                                        paramValue = chunkReader.ReadInt32();
-                                        break;
-                                    case 1:
-                                        paramValue = chunkReader.ReadSingle();
-                                        break;
-                                    default:
-                                        paramValue = "unknownType";
-                                        break;
-                                }
                                 layers.Items[i].shaderData.parameters.Add(new ObjectInfo.ShaderParameter()
                                 {
-                                    Name = param.Name,
-                                    ValueType = param.Type,
-                                    Value = paramValue
+                                    Name = "unk",
+                                    ValueType = -1,
+                                    Value = chunkReader.ReadBytes(4)
                                 });
                             }
                             chunkReader.Seek(returnOffset);
@@ -259,7 +239,7 @@ case 13120: // Additional Items Instances
                     case 13129: // Frame Effects
                         Effect = chunkReader.ReadInt16();
                         EffectParam = chunkReader.ReadInt16();
-                        RGBCoeff = chunkReader.ReadColor();
+                        RGBCoeff = chunkReader.ReadABGR();
                         InkEffect = chunkReader.ReadInt32();
                         var FrmNumberOfParams = chunkReader.ReadInt32();
                         if (CTFAKCore.parameters.Contains("-chunk_info"))
@@ -356,7 +336,8 @@ case 13132: // Unknown
                         "Visible",
                         "WrapHorizontally",
                         "WrapVertically",
-                        "", "", "", "",
+                        "SameEffectAsPreviousLayer",
+                        "", "", "",
                         "", "", "", "", "",
                         "Redraw",
                         "ToHide",

@@ -114,6 +114,15 @@ namespace CTFAK.Memory
             return Color.FromArgb(a, r, g, b);
         }
 
+        public Color ReadABGR()
+        {
+            var b = ReadByte();
+            var g = ReadByte();
+            var r = ReadByte();
+            var a = ReadByte();
+            return Color.FromArgb(a, r, g, b);
+        }
+
         public override byte[] ReadBytes(int count = -1)
         {
             if (count == -1) return base.ReadBytes((int)this.Size());
