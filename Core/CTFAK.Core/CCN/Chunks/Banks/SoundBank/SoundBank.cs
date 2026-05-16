@@ -64,7 +64,7 @@ namespace CTFAK.Core.CCN.Chunks.Banks.SoundBank
             base.Read(reader);
             var start = reader.Tell();
 
-            Handle = reader.ReadUInt32() - 1;
+            Handle = reader.ReadUInt32();
             Checksum = reader.ReadInt32();
 
             References = reader.ReadUInt32();
