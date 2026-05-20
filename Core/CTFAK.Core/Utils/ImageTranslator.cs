@@ -46,9 +46,9 @@ namespace CTFAK.Core.Utils
                     colorArray[newPos + 3] = 255;
                     if (!alpha)
                     {
-                        if (colorArray[newPos + 0] == transparent.R &&
+                        if (colorArray[newPos + 0] == transparent.B &&
                                 colorArray[newPos + 1] == transparent.G &&
-                                colorArray[newPos + 2] == transparent.B)
+                                colorArray[newPos + 2] == transparent.R)
                             colorArray[newPos + 3] = 0;
                     }
                     position += 3;
