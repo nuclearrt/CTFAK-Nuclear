@@ -113,7 +113,7 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
                             colorArray = ImageTranslator.Normal15BitToRGBA(imageData, Width, Height, false, Transparent);
                             break;
                         case 7:
-                            colorArray = ImageTranslator.Normal16BitToRGBA(imageData, Width, Height, false, Transparent);
+                            colorArray = ImageTranslator.Normal16BitToRGBA(imageData, Width, Height, Flags["Alpha"], Transparent);
                             break;
                         case 8:
                             colorArray = ImageTranslator.TwoFivePlusToRGBA(imageData, Width, Height, Flags["Alpha"], Transparent, Flags["RGBA"], Settings.Fusion3Seed);
@@ -288,76 +288,6 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
             if (!IsMFA && !Settings.Old && !Settings.TwoFivePlus)
                 mainRead.Start();
             else mainRead.RunSynchronously();
-        }
-
-        public int WriteNew(ByteWriter writer)
-        {
-            PrepareForMfa();
-            var start = writer.Tell();
-
-            byte[] compressedImg = null;
-            Flags["LZX"] = true;
-
-            compressedImg = Decompressor.CompressBlock(imageData);
-
-            writer.WriteInt32(Handle);
-            writer.WriteInt32(Checksum);
-            writer.WriteInt32(references);
-            writer.WriteUInt32((uint)compressedImg.Length + 4);
-            writer.WriteInt16((short)Width);
-            writer.WriteInt16((short)Height);
-            writer.WriteInt8(GraphicMode);
-            writer.WriteInt8((byte)Flags.flag);
-            writer.WriteInt16(0);
-            writer.WriteInt16(HotspotX);
-            writer.WriteInt16(HotspotY);
-            writer.WriteInt16(ActionX);
-            writer.WriteInt16(ActionY);
-            writer.WriteColor(Transparent);
-            writer.WriteInt32(imageData.Length);
-            writer.WriteBytes(compressedImg);
-
-            var chunkSize = 36 + compressedImg.Length;
-            return (int)(chunkSize + 4 + start);
-        }
-
-        public void PrepareForMfa()
-        {
-            switch (GraphicMode)
-            {
-                case 0:
-                    imageData = ImageTranslator.AndroidMode0ToRGBA(imageData, Width, Height, Flags["Alpha"]);
-                    imageData = ImageTranslator.RGBAToRGBMasked(imageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
-                    break;
-                case 1:
-                    imageData = ImageTranslator.AndroidMode1ToRGBA(imageData, Width, Height, Flags["Alpha"]);
-                    imageData = ImageTranslator.RGBAToRGBMasked(imageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
-                    break;
-                case 2:
-                    imageData = ImageTranslator.AndroidMode2ToRGBA(imageData, Width, Height, Flags["Alpha"]);
-                    imageData = ImageTranslator.RGBAToRGBMasked(imageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
-                    break;
-                case 3:
-                    imageData = ImageTranslator.AndroidMode3ToRGBA(imageData, Width, Height, Flags["Alpha"]);
-                    imageData = ImageTranslator.RGBAToRGBMasked(imageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    imageData = ImageTranslator.AndroidMode5ToRGBA(imageData, Width, Height, Flags["Alpha"]);
-                    imageData = ImageTranslator.RGBAToRGBMasked(imageData, Width, Height, Flags["Alpha"]);
-                    GraphicMode = 4;
-                    break;
-                case 8:
-                    imageData = ImageTranslator.TwoFivePlusToRGBA(imageData, Width, Height, Flags["Alpha"], Transparent, Flags["RGBA"], Settings.Fusion3Seed);
-                    imageData = ImageTranslator.RGBAToRGBMasked(imageData, Width, Height, Flags["Alpha"], Transparent, Flags["RGBA"]);
-                    GraphicMode = 4;
-                    break;
-            }
         }
     }
 }
