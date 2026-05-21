@@ -18,6 +18,8 @@ namespace CTFAK.CCN.Chunks.Banks
         public bool Debug;
         public List<FontItem> Items = new List<FontItem>();
 
+		public string bankHash = "";
+
         public override void Read(ByteReader reader)
         {
             if ((Settings.Old || Settings.Fusion3Seed) && !Settings.isMFA) return;//TODO FIX FIX FIX
@@ -33,6 +35,7 @@ namespace CTFAK.CCN.Chunks.Banks
                 item.Read(reader);
                 item.Handle += (uint)offset;
                 Items.Add(item);
+				bankHash += item.Checksum;
             }
         }
     }

@@ -18,6 +18,7 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
         public Dictionary<int, FusionImage> Items = new();
         public static event SaveHandler OnImageLoaded;
 
+		public string bankHash = "";
 
         public static FusionImage CreateImage()
         {
@@ -39,6 +40,7 @@ namespace CTFAK.Core.CCN.Chunks.Banks.ImageBank
                 newImg.Read(reader);
                 OnImageLoaded?.Invoke(i, count);
                 Items.Add(newImg.Handle, newImg);
+				bankHash += newImg.Checksum;
 
                 if (reader.Tell() >= reader.Size())
                     break;
