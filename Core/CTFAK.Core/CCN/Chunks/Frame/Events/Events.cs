@@ -34,7 +34,6 @@ namespace CTFAK.CCN.Chunks.Frame
             while (true)
             {
                 var identifier = reader.ReadAscii(4);
-				Logger.Log($"Events chunk identifier: {identifier}");
                 if (identifier == Header)
                 {
                     MaxObjects = reader.ReadInt16();
