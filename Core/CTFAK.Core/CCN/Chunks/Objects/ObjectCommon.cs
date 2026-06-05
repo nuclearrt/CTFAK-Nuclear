@@ -120,12 +120,12 @@ namespace CTFAK.CCN.Chunks.Objects
             bool check = reader.ReadInt32() == 0;
             reader.Skip(-6);
 
-            _movementsOffset = reader.ReadInt16();
             _animationsOffset = reader.ReadInt16();
+            _movementsOffset = reader.ReadInt16();
             reader.Skip(2);
+            reader.Skip(2);
+			_extensionOffset = reader.ReadInt16();
             _counterOffset = reader.ReadInt16();
-            _systemObjectOffset = reader.ReadInt16();
-            reader.Skip(2);
 
             Flags.flag = reader.ReadUInt32();
 
@@ -135,9 +135,9 @@ namespace CTFAK.CCN.Chunks.Objects
                 _qualifiers[i] = reader.ReadInt16();
             }
 
-            //reader.Seek(end);
-            _extensionOffset = reader.ReadInt16();
-            _valuesOffset = reader.ReadInt16();
+			//reader.Seek(end);
+			_systemObjectOffset = reader.ReadInt16();
+			_valuesOffset = reader.ReadInt16();
             _stringsOffset = reader.ReadInt16();
 
             NewFlags.flag = reader.ReadUInt16();

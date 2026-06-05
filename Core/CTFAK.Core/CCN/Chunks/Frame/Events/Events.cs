@@ -34,6 +34,7 @@ namespace CTFAK.CCN.Chunks.Frame
             while (true)
             {
                 var identifier = reader.ReadAscii(4);
+				Logger.Log($"Events chunk identifier: {identifier}");
                 if (identifier == Header)
                 {
                     MaxObjects = reader.ReadInt16();
@@ -58,10 +59,15 @@ namespace CTFAK.CCN.Chunks.Frame
                 }
                 else if (identifier == EventgroupData)
                 {
-                    // We skip ccn events since MFA events are used instead. - shishkabob
                     var size = reader.ReadInt32();
+
                     var endPosition = reader.Tell() + size;
-                    reader.Seek(endPosition);
+                    while (reader.Tell() < endPosition)
+                    {
+                        var eg = new EventGroup();
+                        eg.Read(reader);
+                        Items.Add(eg);
+                    }
                 }
                 else if (identifier == EventOptions)
                 {
@@ -112,10 +118,9 @@ namespace CTFAK.CCN.Chunks.Frame
             NumberOfActions = reader.ReadByte();
             Flags = reader.ReadUInt16();
 
-            IsRestricted = reader.ReadInt16(); //For MFA
-            RestrictCpt = reader.ReadInt16();
-            Identifier = reader.ReadInt16();
-            Undo = reader.ReadInt16();
+            reader.Skip(2);
+            IsRestricted = reader.ReadInt32();
+            RestrictCpt = reader.ReadInt32();
 
             for (int i = 0; i < NumberOfConditions; i++)
             {
@@ -306,15 +311,12 @@ namespace CTFAK.CCN.Chunks.Frame
             NumberOfParameters = reader.ReadByte();
             DefType = reader.ReadByte();
             Identifier = reader.ReadInt16();
-            if (CTFAKCore.parameters.Contains("-noevnt")) return;
-            else
+
+            for (int i = 0; i < NumberOfParameters; i++)
             {
-                for (int i = 0; i < NumberOfParameters; i++)
-                {
-                    var item = new Parameter();
-                    item.Read(reader);
-                    Items.Add(item);
-                }
+                var item = new Parameter();
+                item.Read(reader);
+                Items.Add(item);
             }
 
             //Logger.Log(this);
@@ -332,19 +334,19 @@ namespace CTFAK.CCN.Chunks.Frame
     {
         public override void Read(ByteReader reader)
         {
-            var old = false;
             var currentPosition = reader.Tell();
             var size = reader.ReadUInt16();
-            ObjectType = old ? reader.ReadSByte() : reader.ReadInt16();
-            Num = old ? reader.ReadSByte() : reader.ReadInt16();
-            if (ObjectType >= 2 && Num >= 48)
-                if (old) Num += 32;
+
+            ObjectType = reader.ReadInt16();
+            Num = reader.ReadInt16();
+
             ObjectInfo = reader.ReadUInt16();
             ObjectInfoList = reader.ReadInt16();
             Flags = reader.ReadSByte();
             OtherFlags = reader.ReadSByte();
             NumberOfParameters = reader.ReadByte();
             DefType = reader.ReadByte();
+
             for (int i = 0; i < NumberOfParameters; i++)
             {
                 var item = new Parameter();

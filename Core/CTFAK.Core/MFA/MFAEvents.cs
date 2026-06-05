@@ -55,6 +55,10 @@ namespace CTFAK.MFA
             if (size == 0)
                 return;
 
+			//skip over since we are reading ccn mfas now
+			reader.Skip(size);
+			return;
+
             Items = new List<EventGroup>();
 
             while (true)

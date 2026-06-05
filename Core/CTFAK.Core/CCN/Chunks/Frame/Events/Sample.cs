@@ -14,7 +14,6 @@ namespace CTFAK.MMFParser.EXE.Loaders.Events.Parameters
         {
             Handle = reader.ReadInt16();
             Flags = reader.ReadUInt16();
-            Name = reader.ReadYuniversal();
         }
 
         public override string ToString()
