@@ -101,8 +101,8 @@ namespace CTFAK.MFA
             if (Id == 0) return;
             var size = Reader.ReadInt32();
             Data = Reader.ReadBytes(size);
-            if (MFAChunkList.ChunkNames.TryGetValue(Id, out string chunkName))
-                Logger.Log($"Reading MFA Chunk {Id} ({chunkName})");
+            // if (MFAChunkList.ChunkNames.TryGetValue(Id, out string chunkName))
+            //     Logger.Log($"Reading MFA Chunk {Id} ({chunkName})");
             //else
             //Logger.Log($"Reading MFA Chunk {Id}");
             var dataReader = new ByteReader(Data);
